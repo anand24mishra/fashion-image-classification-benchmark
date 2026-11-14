@@ -1,7 +1,7 @@
 # Progress
 
-**Current phase:** v2/04 (review); v2/03 (review). v2/01 and v2/02 done. **v1 is complete** and tagged `v1.0.0`. v2 (Capstone Phase 2, CNN) is planned.
-**Branch:** phase/v2-04-hybrid-svm
+**Current phase:** v2/05 (review); v2/03 and v2/04 (review). v2/01 and v2/02 done. **v1 is complete** and tagged `v1.0.0`. v2 (Capstone Phase 2, CNN) is planned.
+**Branch:** phase/v2-05-report
 **Profile:** lean
 
 ## Phases
@@ -21,6 +21,7 @@
 | 02 | [CNN Test Evaluation & Comparison](phases/v2/phase-02-evaluation-comparison.md) | done | phase/v2-02-evaluation-comparison | 2026-11-14 | 2026-11-14 |
 | 03 | [README, Report & Slides](phases/v2/phase-03-write-up.md) | review | phase/v2-03-write-up | 2026-11-14 | |
 | 04 | [Hybrid CNN Features + RBF SVM](phases/v2/phase-04-hybrid-svm.md) | review | phase/v2-04-hybrid-svm | 2026-11-14 | |
+| 05 | [Final Report](phases/v2/phase-05-final-report.md) | review | phase/v2-05-report | 2026-11-14 | |
 
 Status values: `not-started` → `in-progress` → `review` → `done`
 
@@ -29,6 +30,10 @@ reviewed by the repo owner (with Claude Code) against the phase file and docs �
 each phase starts. Full workflow: [`AGENTS.md`](../AGENTS.md) §6.
 
 ## Session log
+### 2026-11-14 (v2/05 final report)
+- `report/v2/report.tex` rewritten as one paper for Phase 1, Phase 2 and the hybrid, with an author-contributions table; every number recomputed from the saved results. Old v2 slide source and walkthrough removed (D-046).
+- Next: compile on Overleaf, confirm the Phase 2 contribution split, rebuild slides; merge v2/03–v2/05 and tag `v2.0.0`.
+
 ### 2026-11-14 (v2/04 hybrid CNN features + RBF SVM)
 - CNN3's 128 learned features → RBF SVM under the Phase 1 protocol (D-044, written before the run): val 0.9313, test 92.44% (CNN3 92.09%, p = 0.012; `rbf_svm_hog` 91.08%, p = 5.2 × 10⁻⁷). Shirt still not fixed (73.8%). D-045.
 - `test_log.csv` 15 rows; `summary_all.csv` 15 rows; Phase 1 outputs unchanged. Fresh clone runs notebooks 01–08 with 0 errors.

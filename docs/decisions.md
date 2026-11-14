@@ -59,6 +59,7 @@ Rules:
 | D-043 | 2026-11-14 | v2/03 | t-SNE figure not byte-identical after adding PyTorch; committed figure kept | Active |
 | D-044 | 2026-11-14 | v2/04 | Hybrid model: CNN3's learned features fed to the Phase 1 RBF SVM protocol | Active |
 | D-045 | 2026-11-14 | v2/04 | Hybrid result: 92.44%, mostly a features effect; CNN3 stays the recommended model | Active |
+| D-046 | 2026-11-14 | v2/05 | One final report for both phases and the hybrid; slides rebuilt later | Active |
 
 ---
 
@@ -2174,4 +2175,51 @@ test, but the second is small, not visible on validation, and partly confounded 
 
 **Revisit if**
 Multi-seed CNN runs are added (the 0.35-point gap may fall within seed variation), or deployment cost stops mattering.
+
+### D-046 — One final report for both phases and the hybrid; slides rebuilt later
+- **Date:** 2026-11-14
+- **Phase:** v2/05 — Final Report
+- **Status:** Active
+- **Type:** assumption
+
+**Context**
+After the hybrid (D-044, D-045), the Phase 2 report, slide source and viva walkthrough in `report/v2/` described only the
+CNNs and 14 experiments. The final submission needs one paper that tells the whole story, with a table of each author's
+contributions.
+
+**Decision**
+Rewrite `report/v2/report.tex` as the final paper covering Phase 1, Phase 2 and the hybrid. Remove
+`report/v2/ppt.md` and `report/v2/presentation.md` for now; they will be rebuilt from the final report. The Phase 1
+report in `report/v1/` stays unchanged.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Keep a Phase 2-only report and add a hybrid section | The submission asks for one document covering the whole project and its contributions |
+| Update the slides and walkthrough in the same step | They follow the report; writing them twice wastes effort if the report changes |
+
+**Why**
+A single paper lets the three stages share one problem statement, one protocol and one results table, and makes the
+central result—the feature–classifier decomposition—readable against both baselines.
+
+**How it works**
+1. Structure: problem statement and RQ1–RQ9; metrics with formulas (macro-F1, Wilson interval, McNemar); shared
+   protocol; Phase 1; Phase 2; hybrid; discussion and threats to validity; author contributions; 37 references.
+2. Every number was recomputed from `summary_all.csv`, the metrics JSONs and the saved test predictions. Two facts
+   were added from that check: 47 of CNN3's 128 feature units are zero for every training and validation image, so
+   `gamma="scale"` for the hybrid equals 1/81; and Shirt is the lowest-recall class for all 14 trained models.
+3. The Phase 1 contributions follow the split presented in Phase 1; the Phase 2 column is a proposed split held in ten
+   macros at the top of the file, so it can be changed without touching the table.
+
+**Files touched**
+- `report/v2/report.tex` (rewritten); `report/v2/ppt.md`, `report/v2/presentation.md` (removed); `README.md`;
+  `docs/phases/v2/phase-05-final-report.md`; `docs/progress.md`; `notebooks/08_hybrid_cnn_svm.ipynb` (one ratio in the
+  written answer corrected to ~48×, matching the timing shown in the notebook)
+
+**Concepts worth learning**
+- **Dead ReLU:** a unit whose input is negative for every example outputs zero always and carries no information.
+- **Ablation by component swap:** change one part of a pipeline at a time to attribute a difference to it.
+
+**Revisit if**
+The Phase 2 contribution split changes, or a new experiment is added.
 

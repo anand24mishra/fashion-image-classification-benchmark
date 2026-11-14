@@ -130,7 +130,7 @@ v2 asks whether that closes the gap, measured on exactly the same split, test se
 | F-18 | Model choice on val | Training curves for both CNNs; the final CNN is chosen by val accuracy before any test run (D-035). |
 | F-19 | CNN test evaluation | `final_test_run_cnn()` scores each CNN once with the shared `evaluate()`: accuracy, macro F1, per-class recall, parameter count, inference time. `test_log.csv` gains exactly 2 rows; `results/summary_all.csv` has 14 rows; Phase 1 files unchanged. |
 | F-20 | AML vs CNN comparison and error analysis | Side-by-side metrics vs `rbf_svm_hog`, confusion matrices, misclassified-image grids for the same class pairs from both models, model agreement, and a written answer to RQ5–RQ8. Reads saved predictions only. |
-| F-21 | Write-up | README Phase 2 section, IEEE LaTeX report and slides in `report/v2/`. |
+| F-21 | Write-up | README Phase 2 section and one final IEEE LaTeX report in `report/v2/` covering both phases and the hybrid (D-046); slides follow from the report. |
 | F-22 | Hybrid CNN features + RBF SVM | CNN3's 128 last-hidden-layer features feed the RBF SVM under the Phase 1 protocol (`rbf_svm_cnn`, D-044); tested once; `test_log.csv` 15 rows, `summary_all.csv` 15 rows, `summary.csv` unchanged. |
 
 ### 10.4 Non-goals (v2)

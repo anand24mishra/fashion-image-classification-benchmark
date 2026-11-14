@@ -347,7 +347,7 @@ fashion-image-classification-benchmark/
 │   └── hog_sweep.csv            HOG settings tried on val
 ├── report/
 │   ├── v1/                      Phase 1: IEEE report (LaTeX + PDF), slides (PDF + source), team walkthrough
-│   └── v2/                      Phase 2: IEEE report (LaTeX), slide source, team walkthrough
+│   └── v2/                      final IEEE report covering both phases and the hybrid (LaTeX)
 └── docs/
     ├── README.md                index of the docs
     ├── prd.md                   goals, scope, research questions, sanity ranges
@@ -360,7 +360,7 @@ fashion-image-classification-benchmark/
     └── phases/
         ├── _phase-template.md
         ├── v1/                  Phase 1 task files (phase-01 … phase-05)
-        └── v2/                  Phase 2 task files (phase-01 … phase-03)
+        └── v2/                  Phase 2 task files (phase-01 … phase-05)
 ```
 | Want to know… | Read |
 |---|---|
@@ -372,11 +372,11 @@ fashion-image-classification-benchmark/
 | Why each choice was made | [`docs/decisions.md`](docs/decisions.md) |
 
 ## 11. Report and slides
-| | Phase 1 ([`report/v1/`](report/v1/)) | Phase 2 ([`report/v2/`](report/v2/)) |
+| | Phase 1 ([`report/v1/`](report/v1/)) | Final, Phases 1 + 2 ([`report/v2/`](report/v2/)) |
 |---|---|---|
-| IEEE report | `report.tex`, `report.pdf` | `report.tex` (compile on Overleaf, see the header of the file) |
-| Slides | `ppt.md` (source), `ppt.pdf` | `ppt.md` (source) |
-| Team walkthrough for the viva | `presentation.md` | `presentation.md` |
+| IEEE report | `report.tex`, `report.pdf` | `report.tex`: classical benchmark, CNNs and hybrid in one paper (compile on Overleaf, see the header of the file) |
+| Slides | `ppt.md` (source), `ppt.pdf` | to follow |
+| Team walkthrough for the viva | `presentation.md` | to follow |
 
 ## 12. Troubleshooting
 | Problem | Fix |
@@ -390,10 +390,10 @@ fashion-image-classification-benchmark/
 | `RuntimeError: Missing … cnn3_images_best.pt` | Checkpoints are not committed: delete that CNN's `_val.json` and re-run notebook 06 |
 
 ## 13. Team
-| # | Name | Enrollment No. | Phase 1 work | Phase 2 presentation part |
+| # | Name | Enrollment No. | Phase 1 work | Phase 2 work |
 |---|---|---|---|---|
-| 1 | Tanmay Singh | 2401010476 | **Data pipeline & EDA:** dataset download and checksum checks, data sanity checks, fixed train/val/test split, exploratory analysis | Recap, hypotheses & protocol |
-| 2 | Anand Mishra | 2401010065 | **Feature engineering & evaluation framework:** pixel and HOG features, HOG settings sweep, shared tuning, testing and evaluation code | How a CNN works & our architectures |
-| 3 | Rajdeep Sanyal | 2401010370 | **Linear & distance-based models:** Dummy baseline, Logistic Regression, k-Nearest Neighbours (tuning, testing, analysis) | Training, early stopping & model choice |
-| 4 | Rajat Srivastav | 2401020101 | **Tree & kernel models:** Random Forest, Linear SVM, RBF SVM (tuning, testing, analysis) | Test results, significance & cost |
-| 5 | Omved Nagre | 2401010311 | **Results, error analysis & documentation:** summary table, comparison plots, cross-validation, error analysis, final write-up and README | Error analysis & conclusion |
+| 1 | Tanmay Singh | 2401010476 | **Data pipeline & EDA:** dataset download and checksum checks, data sanity checks, fixed train/val/test split, exploratory analysis | **Hypotheses & protocol:** CNN data loaders (train/val only), Phase 2 leakage controls |
+| 2 | Anand Mishra | 2401010065 | **Feature engineering & evaluation framework:** pixel and HOG features, HOG settings sweep, shared tuning, testing and evaluation code | **CNN architectures:** CNN2/CNN3, parameters, compute, receptive field |
+| 3 | Rajdeep Sanyal | 2401010370 | **Linear & distance-based models:** Dummy baseline, Logistic Regression, k-Nearest Neighbours (tuning, testing, analysis) | **CNN training:** early stopping, reproducible training, model choice on validation |
+| 4 | Rajat Srivastav | 2401020101 | **Tree & kernel models:** Random Forest, Linear SVM, RBF SVM (tuning, testing, analysis) | **Hybrid model:** RBF SVM on CNN3 features, features-vs-classifier analysis, cost |
+| 5 | Omved Nagre | 2401010311 | **Results, error analysis & documentation:** summary table, comparison plots, cross-validation, error analysis, final write-up and README | **CNN evaluation & error analysis:** test runs, significance tests, Shirt and shared-error analysis |
