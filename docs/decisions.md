@@ -61,6 +61,7 @@ Rules:
 | D-045 | 2026-11-14 | v2/04 | Hybrid result: 92.44%, mostly a features effect; CNN3 stays the recommended model | Active |
 | D-046 | 2026-11-14 | v2/05 | One final report for both phases and the hybrid; slides rebuilt later | Active |
 | D-047 | 2026-11-14 | v2/05 | Report cites only the sources behind the methods, tools and tests used; layout made overflow-safe | Active |
+| D-048 | 2026-11-14 | v2/05 | Report keeps 4 references and no contributions table; contributions live in the README | Active |
 
 ---
 
@@ -2265,4 +2266,44 @@ A smaller reference list the team can explain is worth more than a long one it c
 
 **Revisit if**
 The report adds a method or tool that needs its own citation.
+
+
+
+### D-048 — Report keeps 4 references and no contributions table; contributions live in the README
+- **Date:** 2026-11-14
+- **Phase:** v2/05 — Final Report
+- **Status:** Active (narrows D-047)
+- **Type:** assumption
+
+**Context**
+Even 14 references were more than the team actually used. The team also wants each person's contributions shown in the
+README, not inside the report.
+
+**Decision**
+Cite only the dataset (Xiao et al.) and the three libraries the code runs on (scikit-learn, scikit-image, PyTorch).
+Methods and statistics (HOG, SVM, Adam, dropout, McNemar, Wilson) are explained in the report with their formulas but
+not cited. Remove the author-contributions section and table from the report; the README team table is the single place
+for contributions.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Keep 14 references (D-047) | Still more than the team used directly |
+| No references at all | The dataset and software must be credited |
+
+**Why**
+Every reference must be something the team used and can defend; one contributions table avoids two copies drifting apart.
+
+**How it works**
+`report/v2/report.tex` has four `\bibitem`s, numbered in order of first citation; the README §13 team table lists
+Phase 1 and Phase 2 work per person.
+
+**Files touched**
+- `report/v2/report.tex`, `README.md`
+
+**Concepts worth learning**
+- **Citing software:** crediting the libraries that produced the results, so they can be reproduced.
+
+**Revisit if**
+The report quotes a result or method from a specific paper.
 

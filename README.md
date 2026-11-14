@@ -204,7 +204,7 @@ many of these images are ambiguous in the data itself.
 - **The hybrid's CNN is frozen:** its features come from CNN3's weights, learned on the 54k train split only; the SVM on
   top follows the Phase 1 protocol (tuned on validation, one test run).
 
-Every design choice and its reasoning is logged in [`docs/decisions.md`](docs/decisions.md) (D-001 to D-047).
+Every design choice and its reasoning is logged in [`docs/decisions.md`](docs/decisions.md) (D-001 to D-048).
 
 ## 8. Limitations (Phase 1)
 - **Grid edges:** the best C sits at the edge of the values tried for Logistic Regression and Linear SVM (0.01, smallest) and
@@ -394,6 +394,6 @@ fashion-image-classification-benchmark/
 |---|---|---|---|---|
 | 1 | Tanmay Singh | 2401010476 | **Data pipeline & EDA:** dataset download and checksum checks, data sanity checks, fixed train/val/test split, exploratory analysis | **CNN data & training:** train/val loaders (no test loader), leakage controls, early stopping, reproducible training, choice of CNN3 on validation |
 | 2 | Anand Mishra | 2401010065 | **Feature engineering & evaluation framework:** pixel and HOG features, HOG settings sweep, shared tuning, testing and evaluation code | **CNN architectures:** CNN2/CNN3, parameters, compute, receptive field |
-| 3 | Rajdeep Sanyal | 2401010370 | **Linear & distance-based models:** Dummy baseline, Logistic Regression, k-Nearest Neighbours (tuning, testing, analysis) | **Hybrid model:** CNN3 features fed to the RBF SVM, features-vs-classifier analysis |
+| 3 | Rajdeep Sanyal | 2401010370 | **Linear & distance-based models:** Dummy baseline, Logistic Regression, k-Nearest Neighbours (tuning, testing, analysis) | **How the CNN works (with Anand Mishra) & the hybrid model:** convolution, ReLU, pooling, dropout and how the network learns; built the hybrid that feeds CNN3's 128 learned features to the RBF SVM (best result, 92.44%) and showed the learned features, not the classifier, drive the gain (+1.36 vs +0.35 points) |
 | 4 | Rajat Srivastav | 2401020101 | **Tree & kernel models:** Random Forest, Linear SVM, RBF SVM (tuning, testing, analysis) | **CNN test metrics & cost:** test runs, accuracy, macro F1, confidence intervals, significance tests, speed and size |
 | 5 | Omved Nagre | 2401010311 | **Results, error analysis & documentation:** summary table, comparison plots, cross-validation, error analysis, final write-up and README | **CNN error analysis:** per-class recall and precision, confusion matrices, Shirt and shared-error analysis |

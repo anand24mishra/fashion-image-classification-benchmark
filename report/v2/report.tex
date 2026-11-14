@@ -14,8 +14,7 @@
 % Every number comes from results/summary_all.csv, results/metrics/*.json, results/training/*.csv, the saved test
 % predictions and the outputs of notebooks 01-08. Confidence intervals (Wilson, 95%) and McNemar tests were computed
 % from the saved predictions; no model was re-run on the test set.
-%
-% AUTHOR CONTRIBUTIONS: edit the ten \contrib... macros below (both phases final).
+
 % =====================================================================================
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
@@ -62,29 +61,6 @@
 \crefname{section}{Section}{Sections}
 \crefname{equation}{Eq.}{Eqs.}
 
-% ---- author contributions (edit here) -------------------------------------------------
-% Phase 1: as presented in Phase 1. Phase 2: as agreed by the team.
-\newcommand{\contribTanmayI}{Data pipeline and exploratory analysis: verified download, integrity checks, fixed
-  stratified split, class-mean images, PCA and t-SNE.}
-\newcommand{\contribTanmayII}{CNN data pipeline and training (\cref{sec:protocol,sec:cnn-train}): train/validation loaders with no
-  test loader, leakage controls, training with early stopping, reproducible runs, validation-only choice of CNN3 (RQ7).}
-\newcommand{\contribAnandI}{Feature engineering and evaluation framework: pixel and HOG features, the HOG sweep, shared
-  tuning, single-use test runs and the evaluation function.}
-\newcommand{\contribAnandII}{CNN architectures (\cref{sec:cnn-arch}): CNN2 and CNN3, parameter, MAC and receptive-field analysis,
-  integration with the shared evaluation function.}
-\newcommand{\contribRajdeepI}{Linear and distance-based models: majority baseline, Logistic Regression and $k$-NN on
-  pixels and HOG (tuning, testing, analysis).}
-\newcommand{\contribRajdeepII}{Hybrid model (\cref{sec:hybrid}): CNN3 feature extraction, RBF SVM on the learned features, the
-  feature--classifier decomposition (RQ9).}
-\newcommand{\contribRajatI}{Tree and kernel models: Random Forest, Linear SVM and RBF SVM on pixels and HOG (tuning,
-  subset tuning and refit of the RBF SVM, testing, analysis).}
-\newcommand{\contribRajatII}{CNN test metrics and cost (\cref{sec:cnn-test}): single-use test runs, accuracy, macro-F1, confidence
-  intervals, McNemar tests, speed and size comparison (RQ5, RQ8).}
-\newcommand{\contribOmvedI}{Results, error analysis and documentation: summary table, comparison plots,
-  cross-validation, error analysis, write-up and README.}
-\newcommand{\contribOmvedII}{CNN error analysis (\cref{sec:cnn-errors}): per-class recall and precision, confusion matrices,
-  Shirt analysis, shared errors and label ambiguity (RQ6).}
-
 \begin{document}
 
 \title{Handcrafted, Learned, or Both?\\[2pt]
@@ -127,7 +103,7 @@ data leakage, McNemar test, error analysis
 \section{Introduction}
 \label{sec:intro}
 An online clothing catalog that tags product photos automatically needs a classifier that is accurate, fast and small.
-Convolutional networks~\cite{lecun1998gradient} are the usual answer for images, but whether they are \emph{necessary},
+Convolutional networks are the usual answer for images, but whether they are \emph{necessary},
 and \emph{why} they help, can only be judged against a strong, honestly evaluated classical baseline: one that never uses
 the test set for a decision, trains every model on the same data, and reports uncertainty and paired tests rather than
 single accuracy numbers.
@@ -203,13 +179,13 @@ macro-F1,
   \label{eq:f1}
 \end{equation}
 which weights a weak class as heavily as a strong one. Uncertainty in accuracy is given by the Wilson score
-interval~\cite{wilson1927probable} with $z=1.96$,
+interval with $z=1.96$,
 \begin{equation}
   \frac{\hat p+\frac{z^2}{2n}\pm z\sqrt{\frac{\hat p(1-\hat p)}{n}+\frac{z^2}{4n^2}}}{1+\frac{z^2}{n}},
   \label{eq:wilson}
 \end{equation}
 about $\pm0.55$\pp{} wide at 91\% accuracy. Two classifiers $A$ and $B$ are compared on the \emph{same} test images with
-McNemar's test~\cite{mcnemar1947note}. If $b$ images are classified correctly only by $A$ and
+McNemar's test. If $b$ images are classified correctly only by $A$ and
 $c$ only by $B$, then under the null hypothesis of equal error rates
 \begin{equation}
   \chi^2=\frac{(|b-c|-1)^2}{b+c}\;\sim\;\chi^2_1 ,
@@ -243,8 +219,8 @@ and decides each one-vs-one binary problem by
 \end{equation}
 so its cost is proportional to the number of support vectors $|\mathcal{S}|$ times the
 feature dimension. scikit-learn's default bandwidth $\gamma=\texttt{scale}$ is $1/(d\cdot\operatorname{Var}[\mathbf{X}])$.
-$k$-NN~\cite{cover1967nearest}, Random Forest~\cite{breiman2001random}, the SVMs~\cite{cortes1995support} and Logistic
-Regression come from scikit-learn~\cite{pedregosa2011scikit}, HOG~\cite{dalal2005histograms} from
+$k$-NN, Random Forest, the SVMs and Logistic
+Regression come from scikit-learn~\cite{pedregosa2011scikit}, HOG from
 scikit-image~\cite{vanderwalt2014scikit}, and the CNNs are built in PyTorch~\cite{paszke2019pytorch}.
 
 \subsection{Convolutional Networks}
@@ -264,7 +240,7 @@ cross-entropy
   \label{eq:ce}
 \end{equation}
 the objective of multinomial logistic regression, now optimized jointly with the features. With gradient
-$\mathbf{g}_t=\nabla_\theta\mathcal{L}$ computed by backpropagation, Adam~\cite{kingma2015adam}
+$\mathbf{g}_t=\nabla_\theta\mathcal{L}$ computed by backpropagation, Adam
 updates
 \begin{equation}
   \begin{aligned}
@@ -278,7 +254,7 @@ updates
 and $\theta_t=\theta_{t-1}-\eta\,\hat{\mathbf{m}}_t/(\sqrt{\hat{\mathbf{v}}_t}+\epsilon)$, with $\beta_1=0.9$,
 $\beta_2=0.999$, $\epsilon=10^{-8}$.
 
-\textbf{Regularization.} During training, dropout~\cite{srivastava2014dropout} multiplies the penultimate activations by
+\textbf{Regularization.} During training, dropout multiplies the penultimate activations by
 a mask $m_i\sim\mathrm{Bernoulli}(1-p)$ and rescales by $1/(1-p)$, so no rescaling is needed at test time, when dropout
 is off. Early stopping keeps the weights with the lowest validation loss and stops after a fixed
 number of epochs (the \emph{patience}) without improvement.
@@ -354,7 +330,7 @@ read once per experiment, after all choices are fixed, and each read is logged.}
 
 \textbf{Exploratory analysis.} Pixels are highly redundant: PCA needs 84 of 784 components to keep 90\% of the variance.
 The class-mean images of the upper-body garments are nearly identical (\cref{fig:eda}; cosine similarity 0.987 for
-Coat--Shirt, 0.984 for Pullover--Coat, 0.983 for Pullover--Shirt), and in a t-SNE~\cite{vandermaaten2008tsne} map
+Coat--Shirt, 0.984 for Pullover--Coat, 0.983 for Pullover--Shirt), and in a t-SNE map
 Pullover, Coat and Shirt form one mixed cloud. Before training any model we therefore predicted that Shirt would have
 the lowest recall and that most errors would fall within the upper-body group.
 
@@ -836,65 +812,15 @@ log and a decision log recording the reason for every choice are available at
 a fresh clone runs all eight notebooks in about two minutes and regenerates every reported number.
 
 % =====================================================================================
-\section*{Author Contributions}
-\Cref{tab:contrib} lists each author's contributions. All authors discussed the results and wrote and reviewed the
-report.
-
-\begin{table*}[t]
-  \centering
-  \caption{Author Contributions}
-  \label{tab:contrib}
-  \renewcommand{\arraystretch}{1.25}
-  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.6cm} >{\raggedright\arraybackslash}p{2.1cm}
-                  >{\raggedright\arraybackslash}p{6.0cm} >{\raggedright\arraybackslash}p{5.6cm}@{}}
-    \toprule
-    Name & Enrollment No. & Phase 1 contributions & Phase 2 contributions \\
-    \midrule
-    Tanmay Singh    & 2401010476 & \contribTanmayI  & \contribTanmayII \\
-    Anand Mishra    & 2401010065 & \contribAnandI   & \contribAnandII \\
-    Rajdeep Sanyal  & 2401010370 & \contribRajdeepI & \contribRajdeepII \\
-    Rajat Srivastav & 2401020101 & \contribRajatI   & \contribRajatII \\
-    Omved Nagre     & 2401010311 & \contribOmvedI   & \contribOmvedII \\
-    \bottomrule
-  \end{tabular}
-\end{table*}
-
-% =====================================================================================
 \begin{thebibliography}{99}
-
-\bibitem{lecun1998gradient}
-Y.~LeCun, L.~Bottou, Y.~Bengio, and P.~Haffner, ``Gradient-based learning applied to document recognition,''
-\emph{Proc. IEEE}, vol.~86, no.~11, pp.~2278--2324, 1998.
 
 \bibitem{xiao2017fashion}
 H.~Xiao, K.~Rasul, and R.~Vollgraf, ``Fashion-MNIST: A novel image dataset for benchmarking machine learning
 algorithms,'' \emph{arXiv preprint arXiv:1708.07747}, 2017.
 
-\bibitem{wilson1927probable}
-E.~B. Wilson, ``Probable inference, the law of succession, and statistical inference,'' \emph{J. Amer. Statist.
-Assoc.}, vol.~22, no.~158, pp.~209--212, 1927.
-
-\bibitem{mcnemar1947note}
-Q.~McNemar, ``Note on the sampling error of the difference between correlated proportions or percentages,''
-\emph{Psychometrika}, vol.~12, no.~2, pp.~153--157, 1947.
-
-\bibitem{cover1967nearest}
-T.~Cover and P.~Hart, ``Nearest neighbor pattern classification,'' \emph{IEEE Trans. Inf. Theory}, vol.~13, no.~1,
-pp.~21--27, 1967.
-
-\bibitem{breiman2001random}
-L.~Breiman, ``Random forests,'' \emph{Mach. Learn.}, vol.~45, no.~1, pp.~5--32, 2001.
-
-\bibitem{cortes1995support}
-C.~Cortes and V.~Vapnik, ``Support-vector networks,'' \emph{Mach. Learn.}, vol.~20, no.~3, pp.~273--297, 1995.
-
 \bibitem{pedregosa2011scikit}
 F.~Pedregosa \emph{et al.}, ``Scikit-learn: Machine learning in Python,'' \emph{J. Mach. Learn. Res.}, vol.~12,
 pp.~2825--2830, 2011.
-
-\bibitem{dalal2005histograms}
-N.~Dalal and B.~Triggs, ``Histograms of oriented gradients for human detection,'' in \emph{Proc. IEEE Conf. Comput.
-Vis. Pattern Recognit. (CVPR)}, 2005, pp.~886--893.
 
 \bibitem{vanderwalt2014scikit}
 S.~van der Walt \emph{et al.}, ``scikit-image: Image processing in Python,'' \emph{PeerJ}, vol.~2, p.~e453, 2014.
@@ -902,18 +828,6 @@ S.~van der Walt \emph{et al.}, ``scikit-image: Image processing in Python,'' \em
 \bibitem{paszke2019pytorch}
 A.~Paszke \emph{et al.}, ``PyTorch: An imperative style, high-performance deep learning library,'' in \emph{Adv. Neural
 Inf. Process. Syst. (NeurIPS)}, vol.~32, 2019, pp.~8024--8035.
-
-\bibitem{kingma2015adam}
-D.~P. Kingma and J.~Ba, ``Adam: A method for stochastic optimization,'' in \emph{Proc. Int. Conf. Learn. Represent.
-(ICLR)}, 2015.
-
-\bibitem{srivastava2014dropout}
-N.~Srivastava, G.~Hinton, A.~Krizhevsky, I.~Sutskever, and R.~Salakhutdinov, ``Dropout: A simple way to prevent neural
-networks from overfitting,'' \emph{J. Mach. Learn. Res.}, vol.~15, pp.~1929--1958, 2014.
-
-\bibitem{vandermaaten2008tsne}
-L.~van der Maaten and G.~Hinton, ``Visualizing data using t-SNE,'' \emph{J. Mach. Learn. Res.}, vol.~9,
-pp.~2579--2605, 2008.
 
 \end{thebibliography}
 

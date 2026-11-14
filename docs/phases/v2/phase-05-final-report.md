@@ -18,7 +18,7 @@ experiments in `test_log.csv` and `summary_all.csv`.
 ## In scope — exact features
 1. **`report/v2/report.tex`** rewritten as the final paper: problem statement, RQ1–RQ9, H1/H2, metrics and formulas,
    shared protocol, Phase 1, Phase 2, hybrid with the feature–classifier decomposition, discussion, threats to validity,
-   author-contributions table (name, enrollment number, Phase 1, Phase 2).
+   team contributions in the README (D-048).
    - Acceptance: every number matches `summary_all.csv`, the JSONs or values recomputed from saved predictions;
      static checks pass (braces, environments, references, citations, figures).
 2. **Slides and walkthrough removed for now** (`report/v2/ppt.md`, `report/v2/presentation.md`); they will be rebuilt
@@ -36,9 +36,8 @@ experiments in `test_log.csv` and `summary_all.csv`.
 - [x] Docs match what was built; decision logged.
 
 ## Phase summary
-- **Built:** `report/v2/report.tex` (IEEE conference, 14 references (D-047), 7 PNG figures plus TikZ protocol and architecture
-  diagrams and a pgfplots accuracy-vs-time plot); author-contribution macros at the top of the file; README §11 and
-  team table updated.
+- **Built:** `report/v2/report.tex` (IEEE conference, 4 references: dataset and libraries (D-048), 7 PNG figures plus TikZ protocol and architecture
+  diagrams and a pgfplots accuracy-vs-time plot); README §11 and team table updated.
 - **Verified:** all numbers recomputed from `summary_all.csv`, the metrics JSONs and the saved test predictions
   (`.scratch` script): Wilson CIs, McNemar χ² and exact p-values, agreement tables, per-class deltas, tops-confusion
   shares, dead-unit count and `gamma="scale"` for the CNN features.
