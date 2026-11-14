@@ -392,8 +392,8 @@ fashion-image-classification-benchmark/
 ## 13. Team
 | # | Name | Enrollment No. | Phase 1 work | Phase 2 work |
 |---|---|---|---|---|
-| 1 | Tanmay Singh | 2401010476 | **Data pipeline & EDA:** dataset download and checksum checks, data sanity checks, fixed train/val/test split, exploratory analysis | **Hypotheses & protocol:** CNN data loaders (train/val only), Phase 2 leakage controls |
+| 1 | Tanmay Singh | 2401010476 | **Data pipeline & EDA:** dataset download and checksum checks, data sanity checks, fixed train/val/test split, exploratory analysis | **CNN data & training:** train/val loaders (no test loader), leakage controls, early stopping, reproducible training, choice of CNN3 on validation |
 | 2 | Anand Mishra | 2401010065 | **Feature engineering & evaluation framework:** pixel and HOG features, HOG settings sweep, shared tuning, testing and evaluation code | **CNN architectures:** CNN2/CNN3, parameters, compute, receptive field |
-| 3 | Rajdeep Sanyal | 2401010370 | **Linear & distance-based models:** Dummy baseline, Logistic Regression, k-Nearest Neighbours (tuning, testing, analysis) | **CNN training:** early stopping, reproducible training, model choice on validation |
-| 4 | Rajat Srivastav | 2401020101 | **Tree & kernel models:** Random Forest, Linear SVM, RBF SVM (tuning, testing, analysis) | **Hybrid model:** RBF SVM on CNN3 features, features-vs-classifier analysis, cost |
-| 5 | Omved Nagre | 2401010311 | **Results, error analysis & documentation:** summary table, comparison plots, cross-validation, error analysis, final write-up and README | **CNN evaluation & error analysis:** test runs, significance tests, Shirt and shared-error analysis |
+| 3 | Rajdeep Sanyal | 2401010370 | **Linear & distance-based models:** Dummy baseline, Logistic Regression, k-Nearest Neighbours (tuning, testing, analysis) | **Hybrid model:** CNN3 features fed to the RBF SVM, features-vs-classifier analysis |
+| 4 | Rajat Srivastav | 2401020101 | **Tree & kernel models:** Random Forest, Linear SVM, RBF SVM (tuning, testing, analysis) | **CNN test metrics & cost:** test runs, accuracy, macro F1, confidence intervals, significance tests, speed and size |
+| 5 | Omved Nagre | 2401010311 | **Results, error analysis & documentation:** summary table, comparison plots, cross-validation, error analysis, final write-up and README | **CNN error analysis:** per-class recall and precision, confusion matrices, Shirt and shared-error analysis |

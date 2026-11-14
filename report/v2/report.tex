@@ -15,7 +15,7 @@
 % predictions and the outputs of notebooks 01-08. Confidence intervals (Wilson, 95%) and McNemar tests were computed
 % from the saved predictions; no model was re-run on the test set.
 %
-% AUTHOR CONTRIBUTIONS: edit the ten \contrib... macros below (Phase 1 is final; Phase 2 is the proposed split).
+% AUTHOR CONTRIBUTIONS: edit the ten \contrib... macros below (both phases final).
 % =====================================================================================
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
@@ -53,27 +53,27 @@
 \crefname{equation}{Eq.}{Eqs.}
 
 % ---- author contributions (edit here) -------------------------------------------------
-% Phase 1: as presented in Phase 1. Phase 2: proposed split, one area per author (edit freely).
+% Phase 1: as presented in Phase 1. Phase 2: as agreed by the team.
 \newcommand{\contribTanmayI}{Data pipeline and exploratory analysis: verified download, integrity checks, fixed
   stratified split, class-mean images, PCA and t-SNE.}
-\newcommand{\contribTanmayII}{Phase~2 hypotheses and protocol: CNN data loaders (train and validation only, no test
-  loader) and the leakage controls of \cref{sec:protocol}.}
+\newcommand{\contribTanmayII}{CNN data pipeline and training (\cref{sec:protocol,sec:cnn-train}): train/validation loaders with no
+  test loader, leakage controls, training with early stopping, reproducible runs, validation-only choice of CNN3 (RQ7).}
 \newcommand{\contribAnandI}{Feature engineering and evaluation framework: pixel and HOG features, the HOG sweep, shared
   tuning, single-use test runs and the evaluation function.}
-\newcommand{\contribAnandII}{CNN architectures (\cref{sec:cnn-arch}): CNN2 and CNN3, parameter, MAC and
-  receptive-field analysis, integration with the shared evaluation function.}
+\newcommand{\contribAnandII}{CNN architectures (\cref{sec:cnn-arch}): CNN2 and CNN3, parameter, MAC and receptive-field analysis,
+  integration with the shared evaluation function.}
 \newcommand{\contribRajdeepI}{Linear and distance-based models: majority baseline, Logistic Regression and $k$-NN on
   pixels and HOG (tuning, testing, analysis).}
-\newcommand{\contribRajdeepII}{CNN training (\cref{sec:cnn-train}): training with early stopping, deterministic
-  reproducible runs, validation-only model selection (RQ7).}
+\newcommand{\contribRajdeepII}{Hybrid model (\cref{sec:hybrid}): CNN3 feature extraction, RBF SVM on the learned features, the
+  feature--classifier decomposition (RQ9).}
 \newcommand{\contribRajatI}{Tree and kernel models: Random Forest, Linear SVM and RBF SVM on pixels and HOG (tuning,
   subset tuning and refit of the RBF SVM, testing, analysis).}
-\newcommand{\contribRajatII}{Hybrid model (\cref{sec:hybrid}): RBF SVM on CNN3 features, feature--classifier
-  decomposition and cost analysis (RQ8, RQ9).}
+\newcommand{\contribRajatII}{CNN test metrics and cost (\cref{sec:cnn-test}): single-use test runs, accuracy, macro-F1, confidence
+  intervals, McNemar tests, speed and size comparison (RQ5, RQ8).}
 \newcommand{\contribOmvedI}{Results, error analysis and documentation: summary table, comparison plots,
   cross-validation, error analysis, write-up and README.}
-\newcommand{\contribOmvedII}{CNN test evaluation and error analysis (\cref{sec:cnn-test,sec:cnn-errors}): significance
-  tests, per-class comparison, shared-error and label-ambiguity analysis (RQ5, RQ6).}
+\newcommand{\contribOmvedII}{CNN error analysis (\cref{sec:cnn-errors}): per-class recall and precision, confusion matrices,
+  Shirt analysis, shared errors and label ambiguity (RQ6).}
 
 \begin{document}
 
