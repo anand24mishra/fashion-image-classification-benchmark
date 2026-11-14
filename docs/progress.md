@@ -1,7 +1,7 @@
 # Progress
 
-**Current phase:** v2/05 (review); v2/03 and v2/04 (review). v2/01 and v2/02 done. **v1 is complete** and tagged `v1.0.0`. v2 (Capstone Phase 2, CNN) is planned.
-**Branch:** phase/v2-05-report
+**Current phase:** v2 complete (v2/01–v2/05 done and merged). v2/01 and v2/02 done. **v1 is complete** and tagged `v1.0.0`. v2 (Capstone Phase 2, CNN) is planned.
+**Branch:** main
 **Profile:** lean
 
 ## Phases
@@ -19,9 +19,9 @@
 |---|---|---|---|---|---|
 | 01 | [CNN Models & Training](phases/v2/phase-01-cnn-training.md) | done | phase/v2-01-cnn-training | 2026-11-14 | 2026-11-14 |
 | 02 | [CNN Test Evaluation & Comparison](phases/v2/phase-02-evaluation-comparison.md) | done | phase/v2-02-evaluation-comparison | 2026-11-14 | 2026-11-14 |
-| 03 | [README, Report & Slides](phases/v2/phase-03-write-up.md) | review | phase/v2-03-write-up | 2026-11-14 | |
-| 04 | [Hybrid CNN Features + RBF SVM](phases/v2/phase-04-hybrid-svm.md) | review | phase/v2-04-hybrid-svm | 2026-11-14 | |
-| 05 | [Final Report](phases/v2/phase-05-final-report.md) | review | phase/v2-05-report | 2026-11-14 | |
+| 03 | [README, Report & Slides](phases/v2/phase-03-write-up.md) | done | phase/v2-03-write-up | 2026-11-14 | 2026-11-14 |
+| 04 | [Hybrid CNN Features + RBF SVM](phases/v2/phase-04-hybrid-svm.md) | done | phase/v2-04-hybrid-svm | 2026-11-14 | 2026-11-14 |
+| 05 | [Final Report](phases/v2/phase-05-final-report.md) | done | phase/v2-05-report | 2026-11-14 | 2026-11-14 |
 
 Status values: `not-started` → `in-progress` → `review` → `done`
 

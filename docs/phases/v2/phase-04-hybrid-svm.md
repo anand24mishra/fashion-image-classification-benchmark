@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | review |
+| Status | done |
 | Branch | `phase/v2-04-hybrid-svm` |
 | Depends on | Phase v2/02 (CNN3 checkpoint and test results) |
 | PRD features | F-22 |

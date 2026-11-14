@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | review |
+| Status | done |
 | Branch | `phase/v2-03-write-up` |
 | Depends on | Phase v2/02 |
 | PRD features | F-21 |

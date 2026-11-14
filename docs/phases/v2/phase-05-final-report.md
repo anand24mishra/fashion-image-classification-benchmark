@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | review |
+| Status | done |
 | Branch | `phase/v2-05-report` |
 | Depends on | Phase v2/04 |
 | PRD features | F-21 (revised, D-046) |
