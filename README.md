@@ -347,7 +347,7 @@ fashion-image-classification-benchmark/
 │   └── hog_sweep.csv            HOG settings tried on val
 ├── report/
 │   ├── v1/                      Phase 1: IEEE report (LaTeX + PDF), slides (PDF + source), team walkthrough
-│   └── v2/                      final IEEE report covering both phases and the hybrid (LaTeX)
+│   └── v2/                      final IEEE report (LaTeX + its 7 figures, upload as is to Overleaf), team walkthrough
 └── docs/
     ├── README.md                index of the docs
     ├── prd.md                   goals, scope, research questions, sanity ranges
@@ -374,9 +374,9 @@ fashion-image-classification-benchmark/
 ## 11. Report and slides
 | | Phase 1 ([`report/v1/`](report/v1/)) | Final, Phases 1 + 2 ([`report/v2/`](report/v2/)) |
 |---|---|---|
-| IEEE report | `report.tex`, `report.pdf` | `report.tex`: classical benchmark, CNNs and hybrid in one paper (compile on Overleaf, see the header of the file) |
+| IEEE report | `report.tex`, `report.pdf` | `report.tex` + its figures: classical benchmark, CNNs and hybrid in one paper (upload the folder to Overleaf) |
 | Slides | `ppt.md` (source), `ppt.pdf` | to follow |
-| Team walkthrough for the viva | `presentation.md` | to follow |
+| Team walkthrough for the viva | `presentation.md` | `presentation.md`: the whole story, each presenter's part, likely questions, decision map |
 
 ## 12. Troubleshooting
 | Problem | Fix |

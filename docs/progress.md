@@ -33,6 +33,7 @@ each phase starts. Full workflow: [`AGENTS.md`](../AGENTS.md) §6.
 ### 2026-11-14 (v2/05 final report)
 - `report/v2/report.tex` rewritten as one paper for Phase 1, Phase 2 and the hybrid, with an author-contributions table; every number recomputed from the saved results. Old v2 slide source and walkthrough removed (D-046).
 - Report references cut to 4 (dataset and the three libraries used), contributions table moved out of the report to the README (D-047, D-048); layout made overflow-safe. Phase 2 contribution split agreed. All repo docs audited for consistency (CLAUDE.md, AGENTS.md, CONTRIBUTING.md, PRD, formats, design note, phase files).
+- Report figures copied next to `report.tex` for Overleaf; `report/v2/presentation.md` rebuilt as the end-to-end team walkthrough.
 - Next: compile on Overleaf, rebuild slides; merge v2/03–v2/05 and tag `v2.0.0`.
 
 ### 2026-11-14 (v2/04 hybrid CNN features + RBF SVM)

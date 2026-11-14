@@ -41,4 +41,6 @@ experiments in `test_log.csv` and `summary_all.csv`.
 - **Verified:** all numbers recomputed from `summary_all.csv`, the metrics JSONs and the saved test predictions
   (`.scratch` script): Wilson CIs, McNemar χ² and exact p-values, agreement tables, per-class deltas, tops-confusion
   shares, dead-unit count and `gamma="scale"` for the CNN features.
+- **Added:** the 7 report figures copied next to `report.tex` (folder uploads to Overleaf as is); `report/v2/presentation.md`, the
+  end-to-end team walkthrough (story, five presenter parts, likely questions, decision map, cheat sheet).
 - **Next:** compile on Overleaf; confirm the Phase 2 contribution split; rebuild slides from the report.
