@@ -56,6 +56,12 @@ Rules:
 | D-040 | 2026-11-14 | v2/01 | Final CNN is CNN3 (val 0.9308 vs 0.9228); depth comparison inconclusive | Active |
 | D-041 | 2026-11-14 | v2/01 | train_cnn seeds and builds its own model and loaders (reproducibility fix) | Active |
 | D-042 | 2026-11-14 | v2/02 | CNN vs classical comparison: models, example pairs and end-to-end time | Active |
+| D-043 | 2026-11-14 | v2/03 | t-SNE figure not byte-identical after adding PyTorch; committed figure kept | Active |
+| D-044 | 2026-11-14 | v2/04 | Hybrid model: CNN3's learned features fed to the Phase 1 RBF SVM protocol | Active |
+| D-045 | 2026-11-14 | v2/04 | Hybrid result: 92.44%, mostly a features effect; CNN3 stays the recommended model | Active |
+| D-046 | 2026-11-14 | v2/05 | One final report for both phases and the hybrid; slides rebuilt later | Active |
+| D-047 | 2026-11-14 | v2/05 | Report cites only the sources behind the methods, tools and tests used; layout made overflow-safe | Active |
+| D-048 | 2026-11-14 | v2/05 | Report keeps 4 references and no contributions table; contributions live in the README | Active |
 
 ---
 
@@ -2010,3 +2016,292 @@ first-in-order images avoid cherry-picking (D-032).
 
 **Revisit if**
 A model is added whose features cost more time than its prediction, or the report needs one-model-only error grids.
+
+### D-043 — t-SNE figure not byte-identical after adding PyTorch; committed figure kept
+- **Date:** 2026-11-14
+- **Phase:** v2/03 — README, Report & Slides
+- **Status:** Active
+- **Type:** edge-case
+
+**Context**
+The final check ran all seven notebooks on a fresh clone. Every result file came out byte-identical except
+`results/figures/eda_tsne.png` from notebook 01. Running notebook 01 at tag `v1.0.0` (before any Phase 2 code) in the
+same environment gives the same changed file, so the cause is the environment, not Phase 2's code. All pinned package
+versions are unchanged; installing `torch==2.15.0` added PyTorch's own OpenMP runtime (`libomp.dylib`).
+
+**Decision**
+Keep the committed Phase 1 figure. Document in the README that this one figure may differ slightly when regenerated.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Commit the regenerated figure | Changes a Phase 1 output for no gain; the v1 report shows the committed version |
+| Force t-SNE to one thread | Edits Phase 1's notebook 01, which Phase 2 must not change; the figure would still differ from the committed one |
+
+**Why**
+The figure is exploratory only: no number, choice or result depends on it, and the regenerated picture shows the same
+clusters in the same places, with individual points shifted slightly (about 10% of pixels differ).
+
+**How it works**
+scikit-learn's Barnes–Hut t-SNE sums gradient contributions in parallel threads. Floating-point addition is not
+associative, so a different threading runtime can change the order of additions and therefore the low-order bits; over
+1,000 optimisation steps these tiny differences move individual points. Seeding fixes the starting point, not the
+summation order.
+
+**Files touched**
+- `README.md` (section 4), `docs/decisions.md`
+
+**Concepts worth learning**
+- **Floating-point non-associativity:** (a + b) + c can differ from a + (b + c) in the last bits.
+- **Bitwise vs. statistical reproducibility:** a result can be the same in substance without being the same bytes.
+
+**Revisit if**
+A reported number (not an exploratory figure) ever changes between runs.
+
+### D-044 — Hybrid model: CNN3's learned features fed to the Phase 1 RBF SVM protocol
+- **Date:** 2026-11-14
+- **Phase:** v2/04 — Hybrid CNN Features + RBF SVM
+- **Status:** Active
+- **Type:** algorithm
+
+**Context**
+Phase 2 showed that CNN3 beats the RBF SVM on HOG (92.09% vs 91.08%), but it changed two things at once: the features
+(learned instead of handcrafted) and the classifier (a softmax layer instead of an RBF SVM). The hybrid separates the
+two. It was parked as out of scope in v2 planning (D-033) and is now added as a fourth v2 phase. This entry was written
+and committed before any tuning or test run of the hybrid, so the protocol cannot be shaped by its results.
+
+**Decision**
+Use the last hidden layer of the final CNN (CNN3, D-040) as a third feature set, `cnn` (128 numbers per image), and run
+the RBF SVM on it with exactly the Phase 1 protocol. The experiment is `rbf_svm_cnn`. It answers a new question, RQ9:
+does an RBF SVM on CNN3's features beat CNN3's own softmax head? It is reported as an extra comparison; it does not
+reopen the choice of the final CNN.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Features from CNN2, or from both CNNs | CNN3 is the chosen final CNN; using both doubles the test runs for a question about the head, not the depth |
+| A different layer (the 1,152 flattened conv outputs) | The 128-unit layer is exactly what the softmax head sees, so the comparison changes only the classifier |
+| Linear SVM or kNN on the CNN features | The RBF SVM is Phase 1's best classifier; one hybrid keeps the scope minimal |
+| Retrain or fine-tune the CNN for the hybrid | The features would no longer be CNN3's; the network stays frozen |
+| A new, larger tuning grid | Phase 1's grid and 10k tuning subset keep the hybrid comparable with `rbf_svm_pixels` and `rbf_svm_hog` |
+
+**Why**
+With the network frozen, the only difference between CNN3 and `rbf_svm_cnn` is the classifier on top of the same 128
+features; the only difference between `rbf_svm_hog` and `rbf_svm_cnn` is the features under the same classifier. One
+experiment therefore answers both "is it the features?" and "is it the head?".
+
+**How it works**
+1. `cnn.load_trained("cnn3")` loads the saved best weights (`models/cnn3_images_best.pt`) in eval mode; nothing is
+   retrained. `cnn.extract_cnn_features()` runs every layer except the final Dropout and Linear(128, 10), so the output
+   is the 128 ReLU activations the softmax head would receive. A check on val: applying CNN3's own head to the
+   extracted features gives 0.9308, the same as CNN3's val accuracy, so the features are the right ones.
+2. `features.get_features("cnn", split)` caches them as `features/cnn3_{split}.npy`, exactly like pixels and HOG.
+3. Phase 1 protocol, unchanged (D-005, D-027, D-029): tune `RBF_SVM_GRID` (C × gamma, 9 combinations) on a stratified
+   10k subset of train, scored on val; refit the chosen parameters on all 54k train images and score on val; then
+   `final_test_run()` refits on all 60k (train + val) and evaluates on test once. `test_log.csv` gains one row (15).
+4. Leakage check: CNN3's weights were learned from the 54k train images only; val was used only for early stopping and
+   the test set never. Extracting features fits nothing. The SVM is tuned on val and tested once, like every model.
+5. A known bias, stated in advance: CNN3 saw the train images during training, so their features are slightly
+   "easier" than val or test features (CNN3's train accuracy at its best epoch was about half a point above val). The
+   SVM is fitted on these features, which is why it is scored on val before the test run.
+6. Timing and size follow Phase 1's HOG rule: `evaluate()` times the SVM on precomputed features, and the notebook
+   reports the feature-extraction time separately, so end-to-end cost = CNN3 features + SVM prediction.
+7. `results.py` gains a `features` filter (default: pixels and HOG), because the hybrid's model name is `rbf_svm`.
+   Without it, Phase 1's `summary.csv` and best-model pick would include the hybrid. `summary_all.csv` gets 15 rows.
+
+**Files touched**
+- `src/cnn.py` (`ARCHITECTURES`, `load_trained`, `extract_cnn_features`), `src/features.py` (kind `cnn`),
+  `src/config.py` (`CNN_FEATURES_FROM`), `src/results.py` (`V1_FEATURES`, `features` argument)
+- `notebooks/08_hybrid_cnn_svm.ipynb`, `notebooks/06_cnn_training.ipynb` (summary call), docs listed in phase v2/04
+
+**Concepts worth learning**
+- **Feature extractor + classifier:** a CNN can be read as learned features (all layers but the last) plus a linear
+  softmax classifier; any classifier can replace the last part.
+- **Frozen network:** its weights are not updated, so it acts as a fixed feature formula, like HOG.
+- **Ablation:** change one component at a time to see which one causes a difference.
+
+**Revisit if**
+The CNN is retrained (the cached `features/cnn3_*.npy` must then be deleted), or a different final CNN is chosen.
+
+### D-045 — Hybrid result: 92.44%, mostly a features effect; CNN3 stays the recommended model
+- **Date:** 2026-11-14
+- **Phase:** v2/04 — Hybrid CNN Features + RBF SVM
+- **Status:** Active
+- **Type:** algorithm
+
+**Context**
+The protocol fixed in D-044 was run once in notebook 08. This entry records the outcome and how it is reported.
+
+**Decision**
+Report `rbf_svm_cnn` as the most accurate model in the study, attribute most of Phase 2's gain to the learned features,
+and keep CNN3 as the recommended model because the hybrid's small gain costs about 6× the prediction time and 10× the
+size.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Call the hybrid the new "final model" | D-044 fixed in advance that it is an extra comparison; it is also tied with CNN3 on validation (0.9313 vs 0.9308) |
+| Refit the hybrid's SVM on 54k only, to match CNN3's training data | Would need a second test run of the same idea; stated as a limitation instead |
+| Drop the result because it complicates the story | A pre-registered experiment is reported whatever it shows |
+
+**Why**
+The two clean comparisons point the same way: changing the features under the same RBF SVM is worth +1.36 test points
+(HOG → CNN3 features), changing the classifier on the same features is worth +0.35. Both are significant by McNemar's
+test, but the second is small, not visible on validation, and partly confounded by the extra 6k training images.
+
+**How it works**
+1. Tuning (10k subset): C = 1, gamma = "scale" (val 0.9292); all nine combinations scored 0.9148–0.9292. Each fit
+   took under 1.5 s, against minutes for HOG, because the features have 128 dimensions instead of 1,728.
+2. Refit on 54k: val 0.9313 (CNN3 0.9308, `rbf_svm_hog` 0.9157). Refit on 60k and one test run: **92.44%**
+   (Wilson 95% CI 91.91–92.94), macro F1 0.9241, 756 errors. `test_log.csv` now has 15 rows.
+3. McNemar (continuity-corrected): hybrid vs CNN3 110 vs 75, χ² = 6.25, p = 0.012; hybrid vs `rbf_svm_hog`
+   430 vs 294, χ² = 25.2, p = 5.2 × 10⁻⁷.
+4. Shirt recall 73.8% (CNN3 75.1%, SVM 75.2%); Shirt → T-shirt/top 117 (CNN3 110). Largest gains over CNN3: Dress
+   +2.5 and Coat +1.5 points. Errors among the four tops: 68.9% of all errors (CNN3 68.1%, SVM 64.2%). The hybrid and
+   CNN3 share 681 errors, 659 with the same wrong label.
+5. Cost: SVM prediction 491 ms per 1,000 images on precomputed features plus ~118 ms for CNN3 features ≈ 0.6 s end to
+   end (CNN3 alone 94 ms, `rbf_svm_hog` ~29.1 s). Size 8.7 MB (7,919 support vectors) plus the CNN3 layers.
+6. A fresh clone runs notebooks 01–08 in about 2 minutes with no errors; without the CNN3 checkpoint, notebook 08 skips
+   only the feature check and timing cell and shows the saved results.
+
+**Files touched**
+- `notebooks/08_hybrid_cnn_svm.ipynb`, `results/metrics/rbf_svm_cnn_{val,val_full,test}.json`, `results/test_log.csv`,
+  `results/summary_all.csv`, `results/figures/hybrid_recall_vs_cnn3.png`, `README.md`, docs listed in phase v2/04
+
+**Concepts worth learning**
+- **Confound:** a second difference (here 60k vs 54k training images) that could explain part of an effect.
+- **Statistical vs practical significance:** p = 0.012 says the 0.35-point gain is unlikely to be luck on this test
+  set; it does not say the gain is worth 6× the prediction time.
+- **Kernel SVM cost scales with support vectors × feature dimension:** fewer, shorter vectors make the hybrid ~59×
+  faster at prediction than the SVM on HOG.
+
+**Revisit if**
+Multi-seed CNN runs are added (the 0.35-point gap may fall within seed variation), or deployment cost stops mattering.
+
+### D-046 — One final report for both phases and the hybrid; slides rebuilt later
+- **Date:** 2026-11-14
+- **Phase:** v2/05 — Final Report
+- **Status:** Active
+- **Type:** assumption
+
+**Context**
+After the hybrid (D-044, D-045), the Phase 2 report, slide source and viva walkthrough in `report/v2/` described only the
+CNNs and 14 experiments. The final submission needs one paper that tells the whole story, with a table of each author's
+contributions.
+
+**Decision**
+Rewrite `report/v2/report.tex` as the final paper covering Phase 1, Phase 2 and the hybrid. Remove
+`report/v2/ppt.md` and `report/v2/presentation.md` for now; they will be rebuilt from the final report. The Phase 1
+report in `report/v1/` stays unchanged.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Keep a Phase 2-only report and add a hybrid section | The submission asks for one document covering the whole project and its contributions |
+| Update the slides and walkthrough in the same step | They follow the report; writing them twice wastes effort if the report changes |
+
+**Why**
+A single paper lets the three stages share one problem statement, one protocol and one results table, and makes the
+central result—the feature–classifier decomposition—readable against both baselines.
+
+**How it works**
+1. Structure: problem statement and RQ1–RQ9; metrics with formulas (macro-F1, Wilson interval, McNemar); shared
+   protocol; Phase 1; Phase 2; hybrid; discussion and threats to validity; author contributions; 37 references.
+2. Every number was recomputed from `summary_all.csv`, the metrics JSONs and the saved test predictions. Two facts
+   were added from that check: 47 of CNN3's 128 feature units are zero for every training and validation image, so
+   `gamma="scale"` for the hybrid equals 1/81; and Shirt is the lowest-recall class for all 14 trained models.
+3. The Phase 1 contributions follow the split presented in Phase 1; the Phase 2 column is a proposed split held in ten
+   macros at the top of the file, so it can be changed without touching the table.
+
+**Files touched**
+- `report/v2/report.tex` (rewritten); `report/v2/ppt.md`, `report/v2/presentation.md` (removed); `README.md`;
+  `docs/phases/v2/phase-05-final-report.md`; `docs/progress.md`; `notebooks/08_hybrid_cnn_svm.ipynb` (one ratio in the
+  written answer corrected to ~48×, matching the timing shown in the notebook)
+
+**Concepts worth learning**
+- **Dead ReLU:** a unit whose input is negative for every example outputs zero always and carries no information.
+- **Ablation by component swap:** change one part of a pipeline at a time to attribute a difference to it.
+
+**Revisit if**
+The Phase 2 contribution split changes, or a new experiment is added.
+
+### D-047 — Report cites only the sources behind the methods, tools and tests used; layout made overflow-safe
+- **Date:** 2026-11-14
+- **Phase:** v2/05 — Final Report
+- **Status:** Active
+- **Type:** assumption
+
+**Context**
+The first draft of the final report cited 37 papers, including a historical related-work survey. The team has not
+studied most of them and could not defend them in the viva. A compiled draft also showed overlapping text.
+
+**Decision**
+Cite only 14 sources, each tied to something the project actually used: the dataset, the methods (HOG, SVM, Random
+Forest, $k$-NN, the CNN, Adam, dropout), the software (scikit-learn, scikit-image, PyTorch), the statistics (McNemar,
+Wilson interval) and t-SNE. Remove the Related Work section; claims that relied on other papers were removed or are now
+supported by the project's own results. Make every wide table and figure unable to overflow its column.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Keep the full survey | Every citation must be defensible in the viva; an unread citation is a liability |
+| No references at all | The methods and tools used must still be credited |
+
+**Why**
+A smaller reference list the team can explain is worth more than a long one it cannot.
+
+**How it works**
+1. References are numbered in order of first citation (IEEE style).
+2. Single-column tables are scaled to the column width; the 15-experiment table is scaled to the page width, with its
+   notes in a fixed-width block; plot labels in the accuracy-vs-time figure are placed by hand; a long inline formula
+   became a display equation; `\emergencystretch` stops long code names from pushing lines into the margin; float
+   settings reduce half-empty pages.
+3. LaTeX is not installed locally, so the final visual check is done after compiling on Overleaf.
+
+**Files touched**
+- `report/v2/report.tex`
+
+**Concepts worth learning**
+- **Overfull box:** a line or table wider than its column; LaTeX lets it stick out, overlapping the next column.
+
+**Revisit if**
+The report adds a method or tool that needs its own citation.
+
+### D-048 — Report keeps 4 references and no contributions table; contributions live in the README
+- **Date:** 2026-11-14
+- **Phase:** v2/05 — Final Report
+- **Status:** Active (narrows D-047)
+- **Type:** assumption
+
+**Context**
+Even 14 references were more than the team actually used. The team also wants each person's contributions shown in the
+README, not inside the report.
+
+**Decision**
+Cite only the dataset (Xiao et al.) and the three libraries the code runs on (scikit-learn, scikit-image, PyTorch).
+Methods and statistics (HOG, SVM, Adam, dropout, McNemar, Wilson) are explained in the report with their formulas but
+not cited. Remove the author-contributions section and table from the report; the README team table is the single place
+for contributions.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Keep 14 references (D-047) | Still more than the team used directly |
+| No references at all | The dataset and software must be credited |
+
+**Why**
+Every reference must be something the team used and can defend; one contributions table avoids two copies drifting apart.
+
+**How it works**
+`report/v2/report.tex` has four `\bibitem`s, numbered in order of first citation; the README §13 team table lists
+Phase 1 and Phase 2 work per person.
+
+**Files touched**
+- `report/v2/report.tex`, `README.md`
+
+**Concepts worth learning**
+- **Citing software:** crediting the libraries that produced the results, so they can be reproduced.
+
+**Revisit if**
+The report quotes a result or method from a specific paper.
+

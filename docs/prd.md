@@ -119,6 +119,7 @@ v2 asks whether that closes the gap, measured on exactly the same split, test se
 | RQ6 | Does the CNN reduce the Shirt / T-shirt / Pullover / Coat confusion? |
 | RQ7 | Does a third conv block help (CNN2 vs CNN3), and what does early stopping do? |
 | RQ8 | What does the CNN cost compared with the classical models (parameters, size, inference time)? |
+| RQ9 | Does an RBF SVM on CNN3's learned features beat CNN3's own softmax head (and the RBF SVM on HOG)? (D-044) |
 
 ### 10.3 Features (must have)
 | ID | Feature | Acceptance criteria |
@@ -129,11 +130,13 @@ v2 asks whether that closes the gap, measured on exactly the same split, test se
 | F-18 | Model choice on val | Training curves for both CNNs; the final CNN is chosen by val accuracy before any test run (D-035). |
 | F-19 | CNN test evaluation | `final_test_run_cnn()` scores each CNN once with the shared `evaluate()`: accuracy, macro F1, per-class recall, parameter count, inference time. `test_log.csv` gains exactly 2 rows; `results/summary_all.csv` has 14 rows; Phase 1 files unchanged. |
 | F-20 | AML vs CNN comparison and error analysis | Side-by-side metrics vs `rbf_svm_hog`, confusion matrices, misclassified-image grids for the same class pairs from both models, model agreement, and a written answer to RQ5–RQ8. Reads saved predictions only. |
-| F-21 | Write-up | README Phase 2 section, IEEE LaTeX report and slides in `report/v2/`. |
+| F-21 | Write-up | README Phase 2 section and one final IEEE LaTeX report in `report/v2/` covering both phases and the hybrid (D-046); slides follow from the report. |
+| F-22 | Hybrid CNN features + RBF SVM | CNN3's 128 last-hidden-layer features feed the RBF SVM under the Phase 1 protocol (`rbf_svm_cnn`, D-044); tested once; `test_log.csv` 15 rows, `summary_all.csv` 15 rows, `summary.csv` unchanged. |
 
 ### 10.4 Non-goals (v2)
 - Transfer learning, pretrained networks, data augmentation, batch normalization, LR schedulers, hyperparameter search.
-- A hybrid CNN-features + SVM model, filter or feature-map visualizations, extra ablations (parked in `progress.md`).
+- Filter or feature-map visualizations, extra ablations (parked in `progress.md`). The hybrid CNN-features + SVM model
+  was parked here at first and added later as v2/04 (D-044).
 - Any change to Phase 1 results, figures, notebooks 01–05, the split file or the seed.
 
 ### 10.5 Success metrics and sanity ranges
@@ -142,5 +145,5 @@ v2 asks whether that closes the gap, measured on exactly the same split, test se
 | CNN2 / CNN3 val and test accuracy | ~91–93% | Below ~89%: suspect a bug (missing `model.eval()`, wrong reshape, wrong learning rate) |
 | Shirt recall | Lowest class again, ~70–80% | Check the confusion matrix |
 | Best epoch | ~5–20 | Best epoch 1 or 30: check learning rate and patience |
-| Test log | 14 rows, each experiment once | Explain any repeat in `decisions.md` |
+| Test log | 14 rows after v2/02, 15 after the hybrid (v2/04), each experiment once | Explain any repeat in `decisions.md` |
 Beating 91.08% is likely but not guaranteed; a tie with a much smaller, faster model is still a finding.

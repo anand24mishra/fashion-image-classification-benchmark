@@ -194,7 +194,7 @@ turned into `_`, e.g. `errors_misclassified_shirt_vs_t-shirt_top.png`.
   `model_size_detail` is `{"type": "parameters", "value": <count>}`, `env` adds `"torch"`. `train_time_s` is the
   training run on 54k (not a 60k refit, D-035).
 - `results/test_log.csv`: +2 rows (`cnn2_images`, `cnn3_images`), 14 in total.
-- `results/summary_all.csv`: the §11 columns, one row per test JSON of every model, 14 rows. `summary.csv` stays the
+- `results/summary_all.csv`: the §11 columns, one row per test JSON of every model: 14 rows after v2/02, 15 after v2/04 (§18). `summary.csv` stays the
   12 Phase 1 rows (D-037).
 
 ## 17. v2: figures
@@ -203,3 +203,13 @@ epoch marked). Notebook 07: `cnn_recall_vs_classical.png`, `errors_confusion_cnn
 `errors_confusion_cnn3_images.png`, and `errors_misclassified_{experiment}_{true}_vs_{pred}.png` for
 `cnn3_images` and `rbf_svm_hog` on the pairs Shirt → T-shirt/top, T-shirt/top → Shirt and Shirt → Coat
 (via `plot_misclassified(..., n=8, tag=experiment)`, D-042). Phase 1 figure files are never rewritten.
+
+## 18. v2/04: hybrid CNN features + RBF SVM (D-044)
+- `features/cnn3_{split}.npy` (gitignored, like all of `features/`): (N, 128) float32, CNN3's last hidden layer, for
+  `train`, `val`, `trainval` (train rows then val rows) and `test`. Delete them if CNN3 is ever retrained.
+- `results/metrics/rbf_svm_cnn_val.json`, `rbf_svm_cnn_val_full.json`, `rbf_svm_cnn_test.json`: the Phase 1 schemas
+  (§7, D-029 and §8) unchanged; `features` is `"cnn"`.
+- `results/test_log.csv`: +1 row (`rbf_svm_cnn`), 15 in total. `results/summary_all.csv`: 15 rows. `summary.csv`
+  unchanged (12 rows).
+- Figure (notebook 08): `hybrid_recall_vs_cnn3.png`, per-class test recall of `rbf_svm_hog`, `cnn3_images` and
+  `rbf_svm_cnn`.

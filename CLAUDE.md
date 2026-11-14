@@ -1,7 +1,8 @@
-# Fashion-MNIST Classical ML Benchmark (Capstone Phase 1)
+# Fashion-MNIST: Classical ML vs a Small CNN (Capstone Phases 1 and 2)
 
-Leak-free, reproducible benchmark of classical ML (LR, kNN, RF, SVM) on raw pixels vs HOG features for Fashion-MNIST,
-with error analysis that motivates the Phase 2 CNN. Built by a 5-person student team, normally one phase per person (phase 05 split in two, D-031), delivered as PRs. v1 is complete. Details: `docs/prd.md`.
+Leak-free, reproducible comparison on Fashion-MNIST. Phase 1 (v1): classical ML (LR, kNN, RF, SVM) on raw pixels vs HOG
+features, with error analysis. Phase 2 (v2): two small CNNs on the same split and evaluation code, error analysis against
+the best classical model, and a hybrid (RBF SVM on CNN3's learned features). Built by a 5-person student team, normally one phase per person (phase 05 split in two, D-031), delivered as PRs. v1 is complete. Details: `docs/prd.md`.
 
 ## Shared rules for all contributors and agents
 @AGENTS.md
@@ -17,7 +18,7 @@ with error analysis that motivates the Phase 2 CNN. Built by a 5-person student 
 
 ## Stack
 - Language: Python 3.12 (conda env `fmnist`, deps via `pip install -r requirements.txt`)
-- ML: scikit-learn, scikit-image (HOG), NumPy, pandas
+- ML: scikit-learn, scikit-image (HOG), NumPy, pandas; PyTorch (CPU) for the Phase 2 CNNs
 - Plots: matplotlib
 - Notebooks: Jupyter in VS Code (local, M3 Mac, 8 GB RAM); Colab as fallback
 - No database, no API, no server
@@ -27,16 +28,17 @@ with error analysis that motivates the Phase 2 CNN. Built by a 5-person student 
 conda create -n fmnist python=3.12 -y && conda activate fmnist
 pip install -r requirements.txt                       # from phase 01 onwards
 python -c "from src.data import download_raw; download_raw()"   # get + verify data
-# then run notebooks/01 → 05 in order (Restart & Run All)
+# then run notebooks/01 → 08 in order (Restart & Run All)
 ```
 
 ## Codebase layout
 ```
-src/          config, utils, data, features, models_linear, models_tree_kernel, experiment, evaluate, results
-notebooks/    01_data_eda … 05_results_analysis (one per phase)
-data/splits/  val_indices.npy (committed); data/raw/, features/ are gitignored
-results/      metrics/*.json, figures/*.png, summary.csv, test_log.csv (committed, code-generated)
-docs/         prd, architecture, system-design, data-formats, module-interfaces, decisions, progress, phases/v1/
+src/          config, utils, data, features, models_linear, models_tree_kernel, cnn, experiment, evaluate, results
+notebooks/    01_data_eda … 05_results_analysis (Phase 1), 06_cnn_training … 08_hybrid_cnn_svm (Phase 2)
+data/splits/  val_indices.npy (committed); data/raw/, features/, models/ are gitignored
+results/      metrics/*.json, figures/*.png, training/, summary.csv, summary_all.csv, test_log.csv (committed, code-generated)
+report/       v1/ Phase 1 report and slides; v2/ final report (both phases and the hybrid)
+docs/         prd, architecture, system-design, data-formats, module-interfaces, decisions, progress, phases/v1/, phases/v2/
 AGENTS.md     workflow + rules for every contributor and AI tool
 CONTRIBUTING.md  step-by-step guide + troubleshooting for team members
 .github/      pull_request_template.md

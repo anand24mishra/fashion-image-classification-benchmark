@@ -14,8 +14,9 @@ from src import config, utils
 from src.data import load_splits
 
 V1_MODELS = ["dummy", "logreg", "knn", "rf", "linear_svm", "rbf_svm"]  # Phase 1: the default everywhere (D-037)
+V1_FEATURES = ["pixels", "hog"]
 MODEL_ORDER = V1_MODELS + ["cnn2", "cnn3"]
-FEATURE_ORDER = ["pixels", "hog", "images"]
+FEATURE_ORDER = V1_FEATURES + ["images", "cnn"]  # "cnn" = CNN3 features fed to the RBF SVM (D-044)
 RECALL_COLS = [f"recall_c{i}" for i in range(config.NUM_CLASSES)]
 
 
@@ -32,15 +33,22 @@ def _model_of(result: dict) -> str:
     return result.get("model") or result["experiment"].rsplit("_", 1)[0]
 
 
-def load_all_metrics(split: str = "test", models: list = V1_MODELS) -> list[dict]:
-    """Read every results/metrics/*_{split}.json ('val', 'test' or 'cv') of the given models, sorted by file name.
+def _features_of(result: dict) -> str:
+    """Feature set of a saved result; CV files have no 'features' key, so take it from the experiment id."""
+    return result.get("features") or result["experiment"].rsplit("_", 1)[1]
 
-    The default is the Phase 1 models only, so Phase 1 outputs never change when CNN results are added (D-037).
+
+def load_all_metrics(split: str = "test", models: list = V1_MODELS, features: list = V1_FEATURES) -> list[dict]:
+    """Read every results/metrics/*_{split}.json ('val', 'test' or 'cv') of the given models and features, sorted by
+    file name.
+
+    The defaults are the Phase 1 models and features only, so Phase 1 outputs never change when Phase 2 results are
+    added (D-037, D-044: the hybrid is model rbf_svm, but on features "cnn").
     """
     if split not in ("val", "test", "cv"):
         raise ValueError(f"split must be 'val', 'test' or 'cv', got {split!r}")
     results = [_read_json(p) for p in sorted(config.METRICS_DIR.glob(f"*_{split}.json"))]
-    return [r for r in results if _model_of(r) in models]
+    return [r for r in results if _model_of(r) in models and _features_of(r) in features]
 
 
 def comparable_val_acc(experiment: str) -> float:
@@ -54,21 +62,22 @@ def comparable_val_acc(experiment: str) -> float:
     return float(_read_json(config.METRICS_DIR / f"{experiment}_val.json")["best_val_acc"])
 
 
-def pick_best_experiment(models: list = V1_MODELS) -> str:
+def pick_best_experiment(models: list = V1_MODELS, features: list = V1_FEATURES) -> str:
     """The experiment with the highest comparable val accuracy. Test scores play no part (D-005, D-029)."""
-    experiments = [d["experiment"] for d in load_all_metrics("val", models)]
+    experiments = [d["experiment"] for d in load_all_metrics("val", models, features)]
     if not experiments:
         raise RuntimeError("No *_val.json files in results/metrics/: run notebooks 03 and 04 first.")
     return max(experiments, key=comparable_val_acc)  # max() keeps the first of equal scores
 
 
-def build_summary(models: list = V1_MODELS, filename: str = "summary.csv") -> pd.DataFrame:
-    """One row per *_test.json of the given models with the data-formats.md §11 columns; writes results/{filename}.
+def build_summary(models: list = V1_MODELS, filename: str = "summary.csv", features: list = V1_FEATURES) -> pd.DataFrame:
+    """One row per *_test.json of the given models and features with the data-formats.md §11 columns; writes
+    results/{filename}.
 
-    Default: Phase 1 models -> summary.csv. Phase 2: build_summary(MODEL_ORDER, "summary_all.csv") (D-037).
+    Default: Phase 1 -> summary.csv. Phase 2: build_summary(MODEL_ORDER, "summary_all.csv", FEATURE_ORDER) (D-037, D-044).
     When timing_comparable is false (the two LR runs, D-024), both timing columns are NaN, never zero.
     """
-    test_metrics = load_all_metrics("test", models)
+    test_metrics = load_all_metrics("test", models, features)
     if not test_metrics:
         raise RuntimeError("No *_test.json files in results/metrics/: run notebooks 03 and 04 first.")
 
@@ -294,8 +303,9 @@ def model_agreement(exp_a: str, exp_b: str) -> dict:
 
 # --- 4. Phase 2: CNN vs classical models (D-037) ---------------------------------------
 
-def plot_recall_comparison(experiments: list) -> plt.Figure:
-    """Grouped bars of per-class test recall for the given experiments. Saves cnn_recall_vs_classical.png."""
+def plot_recall_comparison(experiments: list, name: str = "cnn_recall_vs_classical",
+                           title: str = "Per-class test recall: CNN vs classical models") -> plt.Figure:
+    """Grouped bars of per-class test recall for the given experiments. Saves {name}.png (default as in v2/02)."""
     recalls = {exp: _saved_test(exp)["per_class_recall"] for exp in experiments}
     x = np.arange(config.NUM_CLASSES)
     width = 0.8 / len(experiments)
@@ -307,9 +317,9 @@ def plot_recall_comparison(experiments: list) -> plt.Figure:
     ax.set_xticklabels(config.CLASS_NAMES, rotation=30, ha="right")
     ax.set_ylabel("Test recall (%)")
     ax.set_ylim(50, 100)
-    ax.set_title("Per-class test recall: CNN vs classical models")
+    ax.set_title(title)
     ax.grid(True, axis="y", linestyle="--", alpha=0.5)
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=len(experiments), frameon=False)
     fig.tight_layout()
-    utils.save_fig(fig, "cnn_recall_vs_classical")
+    utils.save_fig(fig, name)
     return fig

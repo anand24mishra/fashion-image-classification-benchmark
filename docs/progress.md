@@ -1,7 +1,7 @@
 # Progress
 
-**Current phase:** v2/03 (not started). v2/01 and v2/02 done. **v1 is complete** and tagged `v1.0.0`. v2 (Capstone Phase 2, CNN) is planned.
-**Branch:** —
+**Current phase:** v2 complete (v2/01–v2/05 done and merged). v2/01 and v2/02 done. **v1 is complete** and tagged `v1.0.0`. v2 (Capstone Phase 2, CNN) is planned.
+**Branch:** main
 **Profile:** lean
 
 ## Phases
@@ -19,7 +19,9 @@
 |---|---|---|---|---|---|
 | 01 | [CNN Models & Training](phases/v2/phase-01-cnn-training.md) | done | phase/v2-01-cnn-training | 2026-11-14 | 2026-11-14 |
 | 02 | [CNN Test Evaluation & Comparison](phases/v2/phase-02-evaluation-comparison.md) | done | phase/v2-02-evaluation-comparison | 2026-11-14 | 2026-11-14 |
-| 03 | [README, Report & Slides](phases/v2/phase-03-write-up.md) | not-started | phase/v2-03-write-up | | |
+| 03 | [README, Report & Slides](phases/v2/phase-03-write-up.md) | done | phase/v2-03-write-up | 2026-11-14 | 2026-11-14 |
+| 04 | [Hybrid CNN Features + RBF SVM](phases/v2/phase-04-hybrid-svm.md) | done | phase/v2-04-hybrid-svm | 2026-11-14 | 2026-11-14 |
+| 05 | [Final Report](phases/v2/phase-05-final-report.md) | done | phase/v2-05-report | 2026-11-14 | 2026-11-14 |
 
 Status values: `not-started` → `in-progress` → `review` → `done`
 
@@ -28,6 +30,22 @@ reviewed by the repo owner (with Claude Code) against the phase file and docs �
 each phase starts. Full workflow: [`AGENTS.md`](../AGENTS.md) §6.
 
 ## Session log
+### 2026-11-14 (v2/05 final report)
+- `report/v2/report.tex` rewritten as one paper for Phase 1, Phase 2 and the hybrid, with an author-contributions table; every number recomputed from the saved results. Old v2 slide source and walkthrough removed (D-046).
+- Report references cut to 4 (dataset and the three libraries used), contributions table moved out of the report to the README (D-047, D-048); layout made overflow-safe. Phase 2 contribution split agreed. All repo docs audited for consistency (CLAUDE.md, AGENTS.md, CONTRIBUTING.md, PRD, formats, design note, phase files).
+- Report figures copied next to `report.tex` for Overleaf; `report/v2/presentation.md` rebuilt as the end-to-end team walkthrough.
+- Next: compile on Overleaf, rebuild slides; merge v2/03–v2/05 and tag `v2.0.0`.
+
+### 2026-11-14 (v2/04 hybrid CNN features + RBF SVM)
+- CNN3's 128 learned features → RBF SVM under the Phase 1 protocol (D-044, written before the run): val 0.9313, test 92.44% (CNN3 92.09%, p = 0.012; `rbf_svm_hog` 91.08%, p = 5.2 × 10⁻⁷). Shirt still not fixed (73.8%). D-045.
+- `test_log.csv` 15 rows; `summary_all.csv` 15 rows; Phase 1 outputs unchanged. Fresh clone runs notebooks 01–08 with 0 errors.
+- Next: add the hybrid to `report/v2/` (report, slides, walkthrough), merge v2/03 and v2/04, tag `v2.0.0`.
+
+### 2026-11-14 (v2/03 README, report & slides)
+- README now covers both phases; Phase 1 report files moved to `report/v1/`; Phase 2 IEEE report, slide source and viva walkthrough in `report/v2/`.
+- Fresh clone: notebooks 01–07 run in ~2 min, 0 errors, 14 test-log rows; only `eda_tsne.png` differs slightly (PyTorch's OpenMP runtime, D-043).
+- Next: compile the report on Overleaf, build the slides, merge, tag `v2.0.0`.
+
 ### 2026-11-14 (v2/02 CNN test evaluation & comparison)
 - One test run per CNN: CNN3 92.09% (final), CNN2 91.85%, vs `rbf_svm_hog` 91.08%. `test_log.csv` 14 rows; `summary_all.csv` 14 rows; Phase 1 outputs unchanged (notebook 05 re-run byte-identical).
 - Notebook 07: Shirt recall not improved (75.1% vs 75.2%, a swap of ~90 images each way); gains on other tops; CNN3 ~300× faster and ~377× smaller than the SVM. D-042.
@@ -119,5 +137,5 @@ each phase starts. Full workflow: [`AGENTS.md`](../AGENTS.md) §6.
 - IEEE LaTeX report (`report/`) and presentation slides inside the repo. Planned after v1 code is done.
 - PCA-reduced pixels as a third feature set (faster SVM/kNN; curse-of-dimensionality demo).
 - LBP texture features; L1 vs L2 Logistic Regression.
-- v2 extras left out of scope: dropout-off ablation, hybrid CNN-features → RBF SVM (`rbf_svm_cnn`), first-layer
+- v2 extras left out of scope: dropout-off ablation, first-layer
   filter and feature-map visualizations, augmentation and batch-norm ablations.

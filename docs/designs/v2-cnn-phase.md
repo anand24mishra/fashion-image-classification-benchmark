@@ -1,5 +1,9 @@
 # Design: Capstone Phase 2 (CNN) as v2 in the existing benchmark repo
 
+> **Status note (2026-11-14):** this is the v2 planning design. Two phases were added after it: v2/04, a hybrid RBF SVM
+> on CNN3's learned features (D-044, D-045), and v2/05, one final report for both phases (D-046). The test log now has
+> 15 rows and `summary_all.csv` 15 rows.
+
 Date: 2026-11-14
 Status: Approved
 

@@ -22,5 +22,5 @@ the doc is updated in the same commit and the reason is logged in `decisions.md`
 ## Phase files
 `phases/vN/phase-NN-<slug>.md`, created from `phases/_phase-template.md`. `vN` is the release
 (its major version: phases in `v1/` ship as tag `v1.x.y`); numbers are two digits and restart at 01
-in each version. A phase id is `vN/NN` (e.g. `v1/02`): run `/phase-start v1/02`, branch
-`phase/v1-02-<slug>`. Each phase leaves the app working and demoable.
+in each version. A phase id is `vN/NN` (e.g. `v1/02`), on branch `phase/v1-02-<slug>`. Each phase leaves the
+notebooks running top-to-bottom.

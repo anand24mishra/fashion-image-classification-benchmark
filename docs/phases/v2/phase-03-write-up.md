@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | not-started |
+| Status | done |
 | Branch | `phase/v2-03-write-up` |
 | Depends on | Phase v2/02 |
 | PRD features | F-21 |
@@ -12,7 +12,9 @@ The Phase 2 results are written up: a README section, an IEEE LaTeX report and s
 saved results. The release is tagged `v2.0.0`.
 
 ## Previous phase summary
-<!-- Filled at phase start from v2/02's "Phase summary". -->
+From v2/02: every number is in `results/summary_all.csv`, the test JSONs and notebook 07 §7. CNN3 (final) 92.09% /
+macro F1 0.9208 vs `rbf_svm_hog` 91.08% / 0.9108; Shirt recall unchanged (75.1% vs 75.2%); CNN3 ~300× faster and
+~377× smaller. `test_log.csv` has 14 rows; no more test evaluations.
 
 ## In scope — exact features
 1. **README Phase 2 section**: what was built, how to run notebooks 06–07, results table generated from
@@ -35,16 +37,16 @@ saved results. The release is tagged `v2.0.0`.
 - `prd.md` §10, `decisions.md` D-033–D-039, notebook 07's written analysis
 
 ## Tasks
-- [ ] 03.1 — README Phase 2 section → `docs(readme): add Phase 2 CNN results`
-- [ ] 03.2 — IEEE report in `report/v2/` → `docs(report): Phase 2 report`
-- [ ] 03.3 — slides in `report/v2/` → `docs(report): Phase 2 slides`
-- [ ] 03.4 — final docs check, fill the phase summary; tag `v2.0.0` after merge → `docs(phase-v2-03): close phase`
+- [x] 03.1 — README Phase 2 section → `docs(readme): add Phase 2 CNN results`
+- [x] 03.2 — IEEE report in `report/v2/` → `docs(report): Phase 2 report`
+- [x] 03.3 — slides in `report/v2/` → `docs(report): Phase 2 slides`
+- [x] 03.4 — final docs check, fill the phase summary; tag `v2.0.0` after merge → `docs(phase-v2-03): close phase`
 
 ## Done criteria
-- [ ] Report compiles; slides exported to PDF.
-- [ ] Every number in README, report and slides matches `summary_all.csv` and the JSONs.
-- [ ] A fresh clone runs notebooks 01–07 top-to-bottom with no errors.
-- [ ] Docs match what was built; decisions logged.
+- [ ] Report compiles; slides exported to PDF. (Pending: compile `report/v2/report.tex` on Overleaf and build the slides from `report/v2/ppt.md`; both PDFs go in `report/v2/`.)
+- [x] Every number in README, report and slides matches `summary_all.csv` and the JSONs.
+- [x] A fresh clone runs notebooks 01–07 top-to-bottom with no errors.
+- [x] Docs match what was built; decisions logged.
 
 ## How to verify
 1. Compile `report/v2/report.tex`; open the PDF.
@@ -52,10 +54,16 @@ saved results. The release is tagged `v2.0.0`.
 3. Fresh clone → set up env → run notebooks 01–07 → `git status` clean.
 
 ## Phase summary
-- **Built:**
-- **Key decisions:**
-- **Known limitations:**
-- **Next phase should know:**
+- **Built:** README covering both phases (headline table, Phase 2 section with RQ5–RQ8, updated leakage rules, layout,
+  troubleshooting, team parts); Phase 1 report files moved to `report/v1/`; `report/v2/report.tex` (IEEE, Overleaf),
+  `report/v2/ppt.md` (15-slide source) and `report/v2/presentation.md` (viva walkthrough in five parts). Later replaced
+  by the final report of v2/05; the slide source and walkthrough were removed, to be rebuilt from it (D-046).
+- **Verified:** report static checks (balanced braces and environments, all references, citations and the 5 figures
+  resolve); every number cross-checked against `summary_all.csv`, the JSONs and the saved predictions (Wilson CIs and
+  McNemar tests recomputed); fresh clone runs notebooks 01–07 in ~2 min with 0 errors and 14 test-log rows.
+- **Key decisions:** D-043 (t-SNE figure differs slightly once PyTorch is installed; committed figure kept).
+- **Known limitations:** the report PDF and slide PDF are not built here (no LaTeX installed; slides via NotebookLM).
+- **Next phase should know:** v2 is the final release; tag `v2.0.0` after merging.
 
 ## Next phase preview
 None: v2 is the final release of the capstone.
