@@ -32,7 +32,8 @@ each phase starts. Full workflow: [`AGENTS.md`](../AGENTS.md) §6.
 ## Session log
 ### 2026-11-14 (v2/05 final report)
 - `report/v2/report.tex` rewritten as one paper for Phase 1, Phase 2 and the hybrid, with an author-contributions table; every number recomputed from the saved results. Old v2 slide source and walkthrough removed (D-046).
-- Next: compile on Overleaf, confirm the Phase 2 contribution split, rebuild slides; merge v2/03–v2/05 and tag `v2.0.0`.
+- Report references cut to the 14 sources behind the methods, tools and tests used; layout made overflow-safe (D-047). Phase 2 contribution split agreed. All repo docs audited for consistency (CLAUDE.md, AGENTS.md, CONTRIBUTING.md, PRD, formats, design note, phase files).
+- Next: compile on Overleaf, rebuild slides; merge v2/03–v2/05 and tag `v2.0.0`.
 
 ### 2026-11-14 (v2/04 hybrid CNN features + RBF SVM)
 - CNN3's 128 learned features → RBF SVM under the Phase 1 protocol (D-044, written before the run): val 0.9313, test 92.44% (CNN3 92.09%, p = 0.012; `rbf_svm_hog` 91.08%, p = 5.2 × 10⁻⁷). Shirt still not fixed (73.8%). D-045.

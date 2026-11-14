@@ -145,5 +145,5 @@ v2 asks whether that closes the gap, measured on exactly the same split, test se
 | CNN2 / CNN3 val and test accuracy | ~91–93% | Below ~89%: suspect a bug (missing `model.eval()`, wrong reshape, wrong learning rate) |
 | Shirt recall | Lowest class again, ~70–80% | Check the confusion matrix |
 | Best epoch | ~5–20 | Best epoch 1 or 30: check learning rate and patience |
-| Test log | 14 rows, each experiment once | Explain any repeat in `decisions.md` |
+| Test log | 14 rows after v2/02, 15 after the hybrid (v2/04), each experiment once | Explain any repeat in `decisions.md` |
 Beating 91.08% is likely but not guaranteed; a tie with a much smaller, faster model is still a finding.

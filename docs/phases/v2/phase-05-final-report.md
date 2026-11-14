@@ -36,7 +36,7 @@ experiments in `test_log.csv` and `summary_all.csv`.
 - [x] Docs match what was built; decision logged.
 
 ## Phase summary
-- **Built:** `report/v2/report.tex` (IEEE conference, 37 references, 7 PNG figures plus TikZ protocol and architecture
+- **Built:** `report/v2/report.tex` (IEEE conference, 14 references (D-047), 7 PNG figures plus TikZ protocol and architecture
   diagrams and a pgfplots accuracy-vs-time plot); author-contribution macros at the top of the file; README §11 and
   team table updated.
 - **Verified:** all numbers recomputed from `summary_all.csv`, the metrics JSONs and the saved test predictions

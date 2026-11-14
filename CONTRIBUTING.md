@@ -35,7 +35,7 @@ Check that everything works: open `notebooks/01_data_eda.ipynb` → **Restart & 
 ## 2. Know your phase
 1. Open [`docs/progress.md`](docs/progress.md). The table shows each phase, its owner and its status.
 2. **Start only when the previous phase is `done`** (merged into `main`). Phases build on each other.
-3. Open **your phase file** in [`docs/phases/v1/`](docs/phases/v1/) and read it fully:
+3. Open **your phase file** in [`docs/phases/v1/`](docs/phases/v1/) or [`docs/phases/v2/`](docs/phases/v2/) and read it fully:
    - **Goal** and **In scope**: what to build, with acceptance criteria.
    - **Previous phase summary**: what already exists and how to use it.
    - **Tasks**: your commits, in order, with the exact commit message for each.

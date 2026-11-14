@@ -60,6 +60,7 @@ Rules:
 | D-044 | 2026-11-14 | v2/04 | Hybrid model: CNN3's learned features fed to the Phase 1 RBF SVM protocol | Active |
 | D-045 | 2026-11-14 | v2/04 | Hybrid result: 92.44%, mostly a features effect; CNN3 stays the recommended model | Active |
 | D-046 | 2026-11-14 | v2/05 | One final report for both phases and the hybrid; slides rebuilt later | Active |
+| D-047 | 2026-11-14 | v2/05 | Report cites only the sources behind the methods, tools and tests used; layout made overflow-safe | Active |
 
 ---
 
@@ -2222,4 +2223,46 @@ central result—the feature–classifier decomposition—readable against both 
 
 **Revisit if**
 The Phase 2 contribution split changes, or a new experiment is added.
+
+### D-047 — Report cites only the sources behind the methods, tools and tests used; layout made overflow-safe
+- **Date:** 2026-11-14
+- **Phase:** v2/05 — Final Report
+- **Status:** Active
+- **Type:** assumption
+
+**Context**
+The first draft of the final report cited 37 papers, including a historical related-work survey. The team has not
+studied most of them and could not defend them in the viva. A compiled draft also showed overlapping text.
+
+**Decision**
+Cite only 14 sources, each tied to something the project actually used: the dataset, the methods (HOG, SVM, Random
+Forest, $k$-NN, the CNN, Adam, dropout), the software (scikit-learn, scikit-image, PyTorch), the statistics (McNemar,
+Wilson interval) and t-SNE. Remove the Related Work section; claims that relied on other papers were removed or are now
+supported by the project's own results. Make every wide table and figure unable to overflow its column.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Keep the full survey | Every citation must be defensible in the viva; an unread citation is a liability |
+| No references at all | The methods and tools used must still be credited |
+
+**Why**
+A smaller reference list the team can explain is worth more than a long one it cannot.
+
+**How it works**
+1. References are numbered in order of first citation (IEEE style).
+2. Single-column tables are scaled to the column width; the 15-experiment table is scaled to the page width, with its
+   notes in a fixed-width block; plot labels in the accuracy-vs-time figure are placed by hand; a long inline formula
+   became a display equation; `\emergencystretch` stops long code names from pushing lines into the margin; float
+   settings reduce half-empty pages.
+3. LaTeX is not installed locally, so the final visual check is done after compiling on Overleaf.
+
+**Files touched**
+- `report/v2/report.tex`
+
+**Concepts worth learning**
+- **Overfull box:** a line or table wider than its column; LaTeX lets it stick out, overlapping the next column.
+
+**Revisit if**
+The report adds a method or tool that needs its own citation.
 

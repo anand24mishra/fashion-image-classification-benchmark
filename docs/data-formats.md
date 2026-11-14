@@ -194,7 +194,7 @@ turned into `_`, e.g. `errors_misclassified_shirt_vs_t-shirt_top.png`.
   `model_size_detail` is `{"type": "parameters", "value": <count>}`, `env` adds `"torch"`. `train_time_s` is the
   training run on 54k (not a 60k refit, D-035).
 - `results/test_log.csv`: +2 rows (`cnn2_images`, `cnn3_images`), 14 in total.
-- `results/summary_all.csv`: the §11 columns, one row per test JSON of every model, 14 rows. `summary.csv` stays the
+- `results/summary_all.csv`: the §11 columns, one row per test JSON of every model: 14 rows after v2/02, 15 after v2/04 (§18). `summary.csv` stays the
   12 Phase 1 rows (D-037).
 
 ## 17. v2: figures

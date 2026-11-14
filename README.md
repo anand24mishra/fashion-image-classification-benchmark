@@ -204,7 +204,7 @@ many of these images are ambiguous in the data itself.
 - **The hybrid's CNN is frozen:** its features come from CNN3's weights, learned on the 54k train split only; the SVM on
   top follows the Phase 1 protocol (tuned on validation, one test run).
 
-Every design choice and its reasoning is logged in [`docs/decisions.md`](docs/decisions.md) (D-001 to D-045).
+Every design choice and its reasoning is logged in [`docs/decisions.md`](docs/decisions.md) (D-001 to D-047).
 
 ## 8. Limitations (Phase 1)
 - **Grid edges:** the best C sits at the edge of the values tried for Logistic Regression and Linear SVM (0.01, smallest) and

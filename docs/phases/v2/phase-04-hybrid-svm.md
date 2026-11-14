@@ -58,4 +58,4 @@ notebook 06, D-041).
 - **Verified:** fresh clone runs notebooks 01–08 in ~2 min with 0 errors; `test_log.csv` 15 rows, each experiment
   once; `summary.csv` 12 rows and every Phase 1 file unchanged (only `eda_tsne.png` differs, D-043).
 - **Known limitations:** one CNN run; the hybrid's SVM saw 60k images vs CNN3's 54k; the report, slides and viva
-  walkthrough in `report/v2/` do not include the hybrid yet.
+  walkthrough in `report/v2/` do not include the hybrid yet (the report does since v2/05, D-046).

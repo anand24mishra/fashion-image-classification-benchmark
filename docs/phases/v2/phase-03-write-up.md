@@ -56,7 +56,8 @@ macro F1 0.9208 vs `rbf_svm_hog` 91.08% / 0.9108; Shirt recall unchanged (75.1% 
 ## Phase summary
 - **Built:** README covering both phases (headline table, Phase 2 section with RQ5–RQ8, updated leakage rules, layout,
   troubleshooting, team parts); Phase 1 report files moved to `report/v1/`; `report/v2/report.tex` (IEEE, Overleaf),
-  `report/v2/ppt.md` (15-slide source) and `report/v2/presentation.md` (viva walkthrough in five parts).
+  `report/v2/ppt.md` (15-slide source) and `report/v2/presentation.md` (viva walkthrough in five parts). Later replaced
+  by the final report of v2/05; the slide source and walkthrough were removed, to be rebuilt from it (D-046).
 - **Verified:** report static checks (balanced braces and environments, all references, citations and the 5 figures
   resolve); every number cross-checked against `summary_all.csv`, the JSONs and the saved predictions (Wilson CIs and
   McNemar tests recomputed); fresh clone runs notebooks 01–07 in ~2 min with 0 errors and 14 test-log rows.

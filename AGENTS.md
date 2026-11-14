@@ -6,9 +6,11 @@ no AI at all). Read it together with [`CONTRIBUTING.md`](CONTRIBUTING.md): the s
 ---
 
 ## 1. What this project is
-A benchmark of **classical machine learning on Fashion-MNIST** (capstone Phase 1). We compare Logistic Regression, kNN,
-Random Forest and SVM on two feature sets (raw pixels and HOG), measure accuracy / speed / size, and explain which clothing
-classes get confused and why. It is an **offline Python pipeline**: `src/` modules + Jupyter notebooks. There is no app,
+A leak-free comparison of **classical machine learning and small CNNs on Fashion-MNIST**. Phase 1 (v1) compares Logistic
+Regression, kNN, Random Forest and SVM on two feature sets (raw pixels and HOG), measures accuracy / speed / size, and
+explains which clothing classes get confused and why. Phase 2 (v2) trains two small CNNs on the same split, scores them with
+the same evaluation code, compares their errors with the best classical model, and tests a hybrid (RBF SVM on CNN3's
+learned features). It is an **offline Python pipeline**: `src/` modules + Jupyter notebooks. There is no app,
 no server and no database.
 
 The work is split into **5 phases**, each normally owned by one person and delivered as one Pull Request (phase 05 was
@@ -22,6 +24,16 @@ split into two PRs, D-031). v1 is complete; owners are in `docs/progress.md`:
 | v1/04 | `docs/phases/v1/phase-04-rf-svm.md` | Random Forest, LinearSVC, RBF SVM |
 | v1/05 | `docs/phases/v1/phase-05-results-analysis.md` | Summary table, comparison plots, error analysis, README |
 
+Phase 2 (v2) phases:
+
+| Phase | File | Builds |
+|---|---|---|
+| v2/01 | `docs/phases/v2/phase-01-cnn-training.md` | CNN data loaders, CNN2 and CNN3, training with early stopping, choice on val |
+| v2/02 | `docs/phases/v2/phase-02-evaluation-comparison.md` | One test run per CNN, comparison and error analysis vs the RBF SVM |
+| v2/03 | `docs/phases/v2/phase-03-write-up.md` | README Phase 2 section, first Phase 2 report |
+| v2/04 | `docs/phases/v2/phase-04-hybrid-svm.md` | Hybrid: RBF SVM on CNN3's learned features |
+| v2/05 | `docs/phases/v2/phase-05-final-report.md` | Final report covering both phases and the hybrid |
+
 Phases are **sequential**: each one uses code merged by the previous one. Start your phase only after the previous
 phase's PR is merged into `main`. You can read your phase file and the docs earlier to prepare.
 
@@ -29,7 +41,7 @@ phase's PR is merged into `main`. You can read your phase file and the docs earl
 1. **This file.**
 2. **`CONTRIBUTING.md`**: the step-by-step workflow (exact git commands, commit/PR steps) and the troubleshooting table. AGENTS.md says *what* the rules are; CONTRIBUTING.md says *how* to carry them out.
 3. `docs/progress.md`: which phase is current, who owns it, and what is already done.
-4. **Your phase file** in `docs/phases/v1/`: the exact tasks, done criteria and how to verify. **Build only what it lists.**
+4. **Your phase file** in `docs/phases/v1/` or `docs/phases/v2/`: the exact tasks, done criteria and how to verify. **Build only what it lists.**
 5. The docs your phase file lists under "Relevant docs". Usually these are:
    - `docs/module-interfaces.md`: the exact function names, inputs and outputs you must implement or call.
    - `docs/data-formats.md`: the exact format of every file you save (JSON keys, CSV columns, figure names).
@@ -80,7 +92,7 @@ These are what the professor will check. Breaking any of them invalidates our re
 - Don't modify inputs in place. Return new arrays or dicts.
 - Errors: raise `ValueError` / `RuntimeError` with a message that says how to fix the problem. No bare `except:`, and never swallow errors.
 - Short functions (< ~50 lines). Short comments only where the *why* isn't obvious.
-- New dependencies are not allowed without asking. The allowed ones are numpy, pandas, scikit-learn, scikit-image, matplotlib, ipykernel.
+- New dependencies are not allowed without asking. The allowed ones are numpy, pandas, scikit-learn, scikit-image, matplotlib, ipykernel, and torch (Phase 2 only, D-039).
 
 **Notebooks**
 - One notebook per phase (`notebooks/0N_*.ipynb`). They call `src/` functions, show plots and contain the written
@@ -194,10 +206,12 @@ If you change a function or file format, also update `module-interfaces.md` / `d
 
 ## 8. Where things live
 ```
-src/            reusable code (config, utils, data, features, models_*, experiment, evaluate, results)
-notebooks/      one notebook per phase: runs src/ code, shows plots, explains results
+src/            reusable code (config, utils, data, features, models_*, cnn, experiment, evaluate, results)
+notebooks/      01-05 Phase 1, 06-08 Phase 2: run src/ code, show plots, explain results
 data/splits/    val_indices.npy, the fixed validation split (committed)
-results/        metrics JSONs, summary.csv, test_log.csv, figures (committed, written only by code)
+models/         CNN checkpoints (gitignored, rebuilt by notebook 06)
+results/        metrics JSONs, summary.csv, summary_all.csv, test_log.csv, training/, figures (committed, written only by code)
+report/         v1/ Phase 1 report and slides; v2/ final report
 docs/           source of truth: PRD, architecture, formats, interfaces, decisions, progress, phase files
 .github/        PR template
 ```

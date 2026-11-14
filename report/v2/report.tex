@@ -27,7 +27,6 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{array}
-\usepackage{threeparttable}
 \usepackage{amsmath,amssymb}
 \usepackage{xcolor}
 \usepackage{tikz}
@@ -46,6 +45,17 @@
 \newcommand{\arrowc}{\,$\rightarrow$\,}
 \newcommand{\hyb}{\textsc{Hybrid}}           % RBF SVM on CNN3 features
 \DeclareMathOperator*{\argmax}{arg\,max}
+
+% ---- layout: no text in the margins, fewer half-empty float pages ---------------------
+\setlength{\emergencystretch}{2em}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.8}
+\renewcommand{\dbltopfraction}{0.9}
+\renewcommand{\dblfloatpagefraction}{0.8}
+\setcounter{topnumber}{3}
+\setcounter{dbltopnumber}{2}
 
 \crefname{table}{Table}{Tables}
 \crefname{figure}{Fig.}{Figs.}
@@ -109,19 +119,18 @@ property of the $28\times28$ data.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Fashion-MNIST, image classification, HOG, support vector machines, convolutional neural networks, transfer of learned
-features, data leakage, McNemar test, error analysis, label ambiguity
+Fashion-MNIST, image classification, HOG, support vector machines, convolutional neural networks, learned features,
+data leakage, McNemar test, error analysis
 \end{IEEEkeywords}
 
 % =====================================================================================
 \section{Introduction}
 \label{sec:intro}
 An online clothing catalog that tags product photos automatically needs a classifier that is accurate, fast and small.
-Convolutional networks are the default answer~\cite{lecun2015deep,krizhevsky2012imagenet}, but whether they are
-\emph{necessary}, and \emph{why} they help, can only be judged against a strong, honestly evaluated classical baseline.
-Published comparisons often fall short of that standard: test sets are reused for tuning, models are compared after
-training on different amounts of data, and single accuracy numbers are reported without uncertainty or paired
-tests~\cite{kaufman2012leakage,cawley2010overfitting,bouthillier2021accounting}.
+Convolutional networks~\cite{lecun1998gradient} are the usual answer for images, but whether they are \emph{necessary},
+and \emph{why} they help, can only be judged against a strong, honestly evaluated classical baseline: one that never uses
+the test set for a decision, trains every model on the same data, and reports uncertainty and paired tests rather than
+single accuracy numbers.
 
 \textbf{Problem statement.} Given the 70{,}000 grayscale $28\times28$ images of Fashion-MNIST~\cite{xiao2017fashion} in ten
 garment classes, we ask (a)~how far fixed, handcrafted representations go; (b)~whether a small learned representation
@@ -166,8 +175,8 @@ features account for most of the improvement, the classifier for a small, valida
   \centering
   \caption{Headline Results on the 10{,}000-Image Test Set}
   \label{tab:headline}
-  \small
-  \setlength{\tabcolsep}{2.5pt}
+  \setlength{\tabcolsep}{4pt}
+  \resizebox{\columnwidth}{!}{%
   \begin{tabular}{@{}l c c c r r@{}}
     \toprule
     Model & Test acc.\ (95\% CI) & Macro-F1 & Shirt & ms/1k & Size \\
@@ -176,51 +185,9 @@ features account for most of the improvement, the classifier for a small, valida
     CNN3           & 92.09 (91.54--92.60) & 0.9208 & 75.1 & \best{94} & \best{0.97\,MB} \\
     \hyb{}         & \best{92.44} (91.91--92.94) & \best{0.9241} & 73.8 & 609 & 9.7\,MB \\
     \bottomrule
-  \end{tabular}\\[2pt]
+  \end{tabular}}\\[2pt]
   {\footnotesize Shirt: recall (\%). ms/1k: end-to-end prediction time per 1{,}000 images, including feature extraction.}
 \end{table}
-
-% =====================================================================================
-\section{Related Work}
-\label{sec:related}
-\textbf{Handcrafted features and kernel machines.} HOG~\cite{dalal2005histograms} summarizes local gradient orientations
-in normalized cell histograms and was the dominant descriptor for detection before deep learning. Support vector
-machines~\cite{cortes1995support} with an RBF kernel turn such descriptors into strong non-linear classifiers; linear
-SVMs~\cite{fan2008liblinear}, nearest neighbors~\cite{cover1967nearest} and random forests~\cite{breiman2001random}
-complete the classical toolbox evaluated here with scikit-learn~\cite{pedregosa2011scikit} and
-scikit-image~\cite{vanderwalt2014scikit}.
-
-\textbf{From receptive fields to CNNs.} Hubel and Wiesel found that visual neurons respond to oriented edges within small,
-hierarchically organized receptive fields~\cite{hubel1962receptive}. Fukushima's Neocognitron turned this into
-alternating feature and pooling layers~\cite{fukushima1980neocognitron}, and LeCun~\emph{et al.}\ trained such networks
-end to end with backpropagation~\cite{rumelhart1986learning}, first for zip codes~\cite{lecun1989backpropagation} and then
-in LeNet-5~\cite{lecun1998gradient}, of which our networks are direct descendants. AlexNet~\cite{krizhevsky2012imagenet}
-combined depth, ReLUs~\cite{nair2010rectified} and dropout to win ImageNet, and small $3\times3$
-filters~\cite{simonyan2015very} and residual connections~\cite{he2016deep} pushed depth further. Goodfellow~\emph{et
-al.}~\cite{goodfellow2016deep} give a textbook treatment of the components we use.
-
-\textbf{Learned features as generic representations.} Zeiler and Fergus~\cite{zeiler2014visualizing} showed that early
-CNN layers learn edge detectors resembling handcrafted descriptors while deeper layers respond to parts. Donahue~\emph{et
-al.}~\cite{donahue2014decaf} and Razavian~\emph{et al.}~\cite{razavian2014cnn} found that activations of a trained CNN,
-fed to a linear SVM, outperform tuned handcrafted pipelines, and Tang~\cite{tang2013deep} replaced the softmax layer of a
-CNN with an SVM objective. Our hybrid uses this idea not to chase accuracy but as an ablation: it holds the classifier
-fixed while swapping the representation, and vice versa.
-
-\textbf{Regularization and optimization.} Dropout~\cite{srivastava2014dropout} randomly removes units during training;
-early stopping~\cite{prechelt1998early} treats the number of epochs as a hyperparameter chosen on held-out data; and
-Adam~\cite{kingma2015adam} adapts per-parameter step sizes. Batch normalization~\cite{ioffe2015batch} and augmentation are
-deliberately excluded, as they are not part of the specified architecture.
-
-\textbf{Fashion-MNIST.} Xiao~\emph{et al.}~\cite{xiao2017fashion} released the dataset as a harder replacement for MNIST,
-with scikit-learn baselines up to 89.7\%. Wide residual networks~\cite{zagoruyko2016wide} with random-erasing
-augmentation reach about 96\%~\cite{zhong2020random}, with orders of magnitude more parameters than our networks. Our goal
-is a controlled measurement, not the state of the art.
-
-\textbf{Rigorous evaluation.} Test-set reuse inflates scores~\cite{kaufman2012leakage}; selecting the best of several
-configurations biases the winning validation score~\cite{cawley2010overfitting}; McNemar's
-test~\cite{mcnemar1947note} is the recommended way to compare two classifiers on one test set~\cite{dietterich1998approximate};
-seed variation can rival reported differences~\cite{bouthillier2021accounting}; and label errors in benchmark test
-sets bound the accuracy any model can be credited with~\cite{northcutt2021pervasive}. Each informs a choice below.
 
 % =====================================================================================
 \section{Problem Formulation and Background}
@@ -242,7 +209,7 @@ interval~\cite{wilson1927probable} with $z=1.96$,
   \label{eq:wilson}
 \end{equation}
 about $\pm0.55$\pp{} wide at 91\% accuracy. Two classifiers $A$ and $B$ are compared on the \emph{same} test images with
-McNemar's test~\cite{mcnemar1947note,dietterich1998approximate}. If $b$ images are classified correctly only by $A$ and
+McNemar's test~\cite{mcnemar1947note}. If $b$ images are classified correctly only by $A$ and
 $c$ only by $B$, then under the null hypothesis of equal error rates
 \begin{equation}
   \chi^2=\frac{(|b-c|-1)^2}{b+c}\;\sim\;\chi^2_1 ,
@@ -269,9 +236,16 @@ kernel variant uses
   K(\mathbf{x},\mathbf{x}') = \exp\!\left(-\gamma\,\lVert\mathbf{x}-\mathbf{x}'\rVert^2\right),
   \label{eq:rbf}
 \end{equation}
-and predicts with $h(\mathbf{x})=\operatorname{sign}\!\big(\sum_{i\in\mathcal{S}}\alpha_iy_iK(\mathbf{x}_i,\mathbf{x})+\beta\big)$
-per one-vs-one binary problem, so its cost is proportional to the number of support vectors $|\mathcal{S}|$ times the
+and decides each one-vs-one binary problem by
+\begin{equation}
+  h(\mathbf{x})=\operatorname{sign}\Big(\sum_{i\in\mathcal{S}}\alpha_i y_i K(\mathbf{x}_i,\mathbf{x})+\beta\Big),
+  \label{eq:svm}
+\end{equation}
+so its cost is proportional to the number of support vectors $|\mathcal{S}|$ times the
 feature dimension. scikit-learn's default bandwidth $\gamma=\texttt{scale}$ is $1/(d\cdot\operatorname{Var}[\mathbf{X}])$.
+$k$-NN~\cite{cover1967nearest}, Random Forest~\cite{breiman2001random}, the SVMs~\cite{cortes1995support} and Logistic
+Regression come from scikit-learn~\cite{pedregosa2011scikit}, HOG~\cite{dalal2005histograms} from
+scikit-image~\cite{vanderwalt2014scikit}, and the CNNs are built in PyTorch~\cite{paszke2019pytorch}.
 
 \subsection{Convolutional Networks}
 \textbf{Convolution.} A layer with $F$ filters of size $k\times k$ over $C$ input channels computes
@@ -279,7 +253,7 @@ feature dimension. scikit-learn's default bandwidth $\gamma=\texttt{scale}$ is $
   z_{f,i,j} = b_f + \sum_{c=1}^{C}\sum_{u=1}^{k}\sum_{v=1}^{k} w_{f,c,u,v}\; x_{c,\,i+u-1,\,j+v-1},
   \label{eq:conv}
 \end{equation}
-followed by $a=\max(0,z)$~\cite{nair2010rectified}. Local connectivity and weight sharing make the layer
+followed by the ReLU $a=\max(0,z)$. Local connectivity and weight sharing make the layer
 translation-equivariant with only $(k^2C+1)F$ parameters. A $2\times2$ max-pooling layer keeps the largest activation per
 window, halving the resolution and adding tolerance to small shifts.
 
@@ -290,7 +264,7 @@ cross-entropy
   \label{eq:ce}
 \end{equation}
 the objective of multinomial logistic regression, now optimized jointly with the features. With gradient
-$\mathbf{g}_t=\nabla_\theta\mathcal{L}$ from backpropagation~\cite{rumelhart1986learning}, Adam~\cite{kingma2015adam}
+$\mathbf{g}_t=\nabla_\theta\mathcal{L}$ computed by backpropagation, Adam~\cite{kingma2015adam}
 updates
 \begin{equation}
   \begin{aligned}
@@ -306,7 +280,7 @@ $\beta_2=0.999$, $\epsilon=10^{-8}$.
 
 \textbf{Regularization.} During training, dropout~\cite{srivastava2014dropout} multiplies the penultimate activations by
 a mask $m_i\sim\mathrm{Bernoulli}(1-p)$ and rescales by $1/(1-p)$, so no rescaling is needed at test time, when dropout
-is off. Early stopping~\cite{prechelt1998early} keeps the weights with the lowest validation loss and stops after a fixed
+is off. Early stopping keeps the weights with the lowest validation loss and stops after a fixed
 number of epochs (the \emph{patience}) without improvement.
 
 % =====================================================================================
@@ -457,20 +431,19 @@ Phase~2 models.
 
 \begin{table*}[t]
   \centering
-  \begin{threeparttable}
   \caption{All 15 Experiments: Same Split, Same Evaluation Code, One Test Run Each}
   \label{tab:results}
-  \small
-  \setlength{\tabcolsep}{3.8pt}
+  \setlength{\tabcolsep}{4pt}
+  \resizebox{\textwidth}{!}{%
   \begin{tabular}{@{}l l c c c c r r r r@{}}
     \toprule
     Model & Representation & Val.\ acc. & Test acc. & 95\% CI (\%) & Macro-F1 & Errors & Train (s) & Pred.\ (ms/1k) & Size \\
     \midrule
     \multicolumn{10}{@{}l}{\emph{Phase 1: classical pipelines}} \\
-    \multirow{2}{*}{Majority class} & Pixels & 0.1000 & 0.1000 & 9.43--10.60 & 0.0182 & 9{,}000 & 0.00 & 0.00\tnote{a} & 709\,B \\
-                                    & HOG    & 0.1000 & 0.1000 & 9.43--10.60 & 0.0182 & 9{,}000 & 0.16 & 0.01\tnote{a} & 709\,B \\
-    \multirow{2}{*}{Logistic Regression} & Pixels & 0.8642 & 0.8472 & 84.00--85.41 & 0.8464 & 1{,}528 & n/a\tnote{b} & n/a\tnote{b} & 51.4\,KB \\
-                                         & HOG    & 0.8927 & 0.8886 & 88.23--89.46 & 0.8885 & 1{,}114 & n/a\tnote{b} & n/a\tnote{b} & 111.8\,KB \\
+    \multirow{2}{*}{Majority class} & Pixels & 0.1000 & 0.1000 & 9.43--10.60 & 0.0182 & 9{,}000 & 0.00 & 0.00$^{\mathrm{a}}$ & 709\,B \\
+                                    & HOG    & 0.1000 & 0.1000 & 9.43--10.60 & 0.0182 & 9{,}000 & 0.16 & 0.01$^{\mathrm{a}}$ & 709\,B \\
+    \multirow{2}{*}{Logistic Regression} & Pixels & 0.8642 & 0.8472 & 84.00--85.41 & 0.8464 & 1{,}528 & n/a$^{\mathrm{b}}$ & n/a$^{\mathrm{b}}$ & 51.4\,KB \\
+                                         & HOG    & 0.8927 & 0.8886 & 88.23--89.46 & 0.8885 & 1{,}114 & n/a$^{\mathrm{b}}$ & n/a$^{\mathrm{b}}$ & 111.8\,KB \\
     \multirow{2}{*}{$k$-NN} & Pixels & 0.8747 & 0.8611 & 85.42--86.77 & 0.8614 & 1{,}389 & 0.49 & 6{,}926.61 & 188.7\,MB \\
                             & HOG    & 0.8728 & 0.8631 & 85.62--86.97 & 0.8623 & 1{,}369 & 1.29 & 731.13 & 415.2\,MB \\
     \multirow{2}{*}{Random Forest} & Pixels & 0.8867 & 0.8756 & 86.90--88.19 & 0.8741 & 1{,}244 & 32.83 & 12.16 & 366.5\,MB \\
@@ -478,30 +451,29 @@ Phase~2 models.
     \multirow{2}{*}{Linear SVM} & Pixels & 0.8583 & 0.8378 & 83.04--84.49 & 0.8353 & 1{,}622 & 99.24 & 1.22 & 82.7\,KB \\
                                 & HOG    & 0.8900 & 0.8898 & 88.35--89.58 & 0.8892 & 1{,}102 & 162.04 & 2.62 & 180.8\,KB \\
     \multirow{2}{*}{RBF SVM} & Pixels & 0.9082 & 0.8970 & 89.09--90.28 & 0.8967 & 1{,}030 & 195.67 & 4{,}766.94 & 125.1\,MB \\
-                             & HOG    & 0.9157 & 0.9108 & 90.51--91.62 & 0.9108 & 892 & 451.43 & 28{,}876.96\tnote{c} & 366.2\,MB \\
+                             & HOG    & 0.9157 & 0.9108 & 90.51--91.62 & 0.9108 & 892 & 451.43 & 28{,}876.96$^{\mathrm{c}}$ & 366.2\,MB \\
     \midrule
     \multicolumn{10}{@{}l}{\emph{Phase 2: convolutional networks (trained on 54k, not refit)}} \\
     CNN2 & Image & 0.9228 & 0.9185 & 91.30--92.37 & 0.9176 & 815 & 198.22 & 58.36 & 1.69\,MB \\
     CNN3 & Image & 0.9308 & 0.9209 & 91.54--92.60 & 0.9208 & 791 & 416.13 & 94.43 & 0.97\,MB \\
     \midrule
     \multicolumn{10}{@{}l}{\emph{Phase 2: hybrid}} \\
-    \best{RBF SVM} & \best{CNN3 features} & \best{0.9313} & \best{0.9244} & \best{91.91--92.94} & \best{0.9241} & \best{756} & 7.36\tnote{d} & 491.23\tnote{d} & 8.7\,MB\tnote{d} \\
+    \best{RBF SVM} & \best{CNN3 features} & \best{0.9313} & \best{0.9244} & \best{91.91--92.94} & \best{0.9241} & \best{756} & 7.36$^{\mathrm{d}}$ & 491.23$^{\mathrm{d}}$ & 8.7\,MB$^{\mathrm{d}}$ \\
     \bottomrule
-  \end{tabular}
-  \begin{tablenotes}\footnotesize
-    \item Val.\ acc.: model trained on 54k (RBF SVMs refit on 54k for comparability). Test: classical and hybrid models
+  \end{tabular}}\\[3pt]
+  \begin{minipage}{\textwidth}\footnotesize
+    Val.\ acc.: model trained on 54k (RBF SVMs refit on 54k for comparability). Test: classical and hybrid models
           refit on 60k; CNNs trained on 54k. CI: Wilson 95\% interval, \cref{eq:wilson}. Pred.: model-only time per
           1{,}000 test images, best of three; HOG extraction adds $\approx$216\,ms. Size: serialized model. Best result
-          in bold.
-    \item[a] Measured on a different machine; excluded from speed comparisons.
-    \item[b] Not comparable (runs overlapped other workloads); accuracy unaffected.
-    \item[c] 26{,}343 support vectors; treated as an upper bound.
-    \item[d] SVM only: 7{,}919 support vectors on precomputed features. CNN3 feature extraction adds $\approx$118\,ms per
-          1{,}000 images, the CNN3 layers $\approx$0.97\,MB, and training CNN3 once 416\,s.
-    \item Timing hardware: $k$-NN, CNNs and hybrid on an Apple M3; Random Forest and RBF/Linear SVMs on an Apple M3 Pro;
+          in bold.\\
+    $^{\mathrm{a}}$\,Measured on a different machine; excluded from speed comparisons.\\
+    $^{\mathrm{b}}$\,Not comparable (runs overlapped other workloads); accuracy unaffected.\\
+    $^{\mathrm{c}}$\,26{,}343 support vectors; treated as an upper bound.\\
+    $^{\mathrm{d}}$\,SVM only: 7{,}919 support vectors on precomputed features. CNN3 feature extraction adds $\approx$118\,ms per
+          1{,}000 images, the CNN3 layers $\approx$0.97\,MB, and training CNN3 once 416\,s.\\
+    Timing hardware: $k$-NN, CNNs and hybrid on an Apple M3; Random Forest and RBF/Linear SVMs on an Apple M3 Pro;
           4 threads throughout.
-  \end{tablenotes}
-  \end{threeparttable}
+  \end{minipage}
 \end{table*}
 
 \subsection{Error Analysis (RQ4)}
@@ -549,7 +521,7 @@ $7\times7$ map. Stacking enlarges the receptive field from $10\times10$ to $22\t
   \draw[arr] (in) -- (b1); \draw[arr] (b1) -- (b2); \draw[arr] (b2) -- (b3);
   \draw[arr] (b3) -- (fc); \draw[arr] (fc) -- (do); \draw[arr] (do) -- (out);
   \node[below=1mm of b2, font=\sffamily\scriptsize, align=center] {block = Conv $3{\times}3$ (pad 1) + ReLU + MaxPool $2{\times}2$};
-  \node[below=1mm of fc, font=\sffamily\scriptsize, align=center, text=green!30!black] {hybrid taps here};
+  \node[above=1mm of fc, font=\sffamily\scriptsize, align=center, text=green!30!black] {hybrid taps here};
 \end{tikzpicture}}
 \caption{Architecture. CNN2 skips the dashed block and flattens $64{\times}7{\times}7=3{,}136$ values; CNN3 flattens
 $128{\times}3{\times}3=1{,}152$. The 128 activations after the first dense layer (green) are the learned features used by
@@ -562,6 +534,7 @@ the hybrid (\cref{sec:hybrid}).}
   \caption{Parameters, Compute and Receptive Field}
   \label{tab:arch}
   \setlength{\tabcolsep}{4pt}
+  \resizebox{\columnwidth}{!}{%
   \begin{tabular}{@{}l r r r@{}}
     \toprule
     Layer & CNN2 params & CNN3 params & MACs per image \\
@@ -575,7 +548,7 @@ the hybrid (\cref{sec:hybrid}).}
     \textbf{Total}      & \textbf{421{,}642} & \textbf{241{,}546} & \textbf{4.24M / 7.60M} \\
     Receptive field     & $10\times10$ & $22\times22$ & \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}}
 \end{table}
 
 \subsection{Training and Model Selection (RQ7)}
@@ -624,28 +597,37 @@ which is faster (12\,ms) but 4.3\pp{} less accurate than CNN2.
   \centering
   \begin{tikzpicture}
     \begin{semilogxaxis}[
-      width=\linewidth, height=6.2cm,
+      width=\linewidth, height=6.4cm,
       xlabel={End-to-end prediction time per 1{,}000 images (ms, log scale)},
       ylabel={Test accuracy (\%)},
-      xmin=5, xmax=60000, ymin=83, ymax=93.2,
+      xmin=5, xmax=100000, ymin=83, ymax=93.4,
       grid=both, grid style={gray!20}, minor grid style={gray!8},
       tick label style={font=\scriptsize}, label style={font=\footnotesize},
-      nodes near coords, point meta=explicit symbolic,
-      every node near coord/.append style={font=\tiny, anchor=west, xshift=1pt},
-      legend style={font=\scriptsize, at={(0.98,0.03)}, anchor=south east},
+      legend style={font=\scriptsize, at={(0.02,0.03)}, anchor=south west},
+      lbl/.style={font=\tiny, inner sep=1.5pt},
     ]
       \addplot[only marks, mark=o, mark size=2pt, blue!70!black] coordinates {
-        (12.16,87.56)[RF/pix] (6926.61,86.11)[$k$NN/pix] (4766.94,89.70)[RBF/pix]};
+        (12.16,87.56) (6926.61,86.11) (4766.94,89.70)};
       \addlegendentry{Classical, pixels}
       \addplot[only marks, mark=square, mark size=2pt, orange!80!black] coordinates {
-        (235.02,87.03)[RF/HOG] (947.13,86.31)[$k$NN/HOG] (218.62,88.98)[LinSVM/HOG] (29092.96,91.08)[RBF/HOG]};
+        (235.02,87.03) (947.13,86.31) (218.62,88.98) (29092.96,91.08)};
       \addlegendentry{Classical, HOG}
       \addplot[only marks, mark=triangle*, mark size=2.8pt, red!75!black] coordinates {
-        (58.36,91.85)[CNN2] (94.43,92.09)[CNN3]};
+        (58.36,91.85) (94.43,92.09)};
       \addlegendentry{CNN}
       \addplot[only marks, mark=diamond*, mark size=3pt, green!50!black] coordinates {
-        (609.23,92.44)[Hybrid]};
+        (609.23,92.44)};
       \addlegendentry{Hybrid}
+      \node[lbl, anchor=west]  at (axis cs:12.16,87.56)    {RF / pixels};
+      \node[lbl, anchor=north] at (axis cs:6926.61,86.11)  {$k$-NN / pixels};
+      \node[lbl, anchor=east]  at (axis cs:4766.94,89.70)  {RBF / pixels};
+      \node[lbl, anchor=north] at (axis cs:235.02,87.03)   {RF / HOG};
+      \node[lbl, anchor=west]  at (axis cs:947.13,86.31)   {$k$-NN / HOG};
+      \node[lbl, anchor=east]  at (axis cs:218.62,88.98)   {Lin.\ SVM / HOG};
+      \node[lbl, anchor=east]  at (axis cs:29092.96,91.08) {RBF / HOG};
+      \node[lbl, anchor=east]  at (axis cs:58.36,91.85)    {CNN2};
+      \node[lbl, anchor=south] at (axis cs:94.43,92.09)    {CNN3};
+      \node[lbl, anchor=west]  at (axis cs:609.23,92.44)   {Hybrid};
     \end{semilogxaxis}
   \end{tikzpicture}
   \caption{Accuracy vs.\ end-to-end prediction time (feature extraction included). The CNNs sit alone in the
@@ -676,6 +658,7 @@ $p=1.0$): the models \emph{trade} shirts. Because the CNN removes easier errors 
   \centering
   \caption{Agreement of CNN3 and the RBF SVM (HOG) on the Test Set}
   \label{tab:agree}
+  \resizebox{\columnwidth}{!}{%
   \begin{tabular}{@{}l c c r@{}}
     \toprule
     & \multicolumn{2}{c}{RBF SVM / HOG} & \\
@@ -687,7 +670,7 @@ $p=1.0$): the models \emph{trade} shirts. Because the CNN removes easier errors 
     \midrule
     Total   & 9{,}108 & 892 & 10{,}000 \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}}
 \end{table}
 
 \textbf{Shared errors point to the data.} The two models share no features---one sees gradient histograms through a
@@ -758,6 +741,7 @@ finding: \emph{what moved Phase~2 past Phase~1 is what the network learned to se
   \caption{Feature--Classifier Decomposition (Paired Test Comparisons)}
   \label{tab:decomp}
   \setlength{\tabcolsep}{3pt}
+  \resizebox{\columnwidth}{!}{%
   \begin{tabular}{@{}l l r c c@{}}
     \toprule
     Swap (A vs.\ B) & Held fixed & $\Delta$acc & only A / only B & $p$ \\
@@ -766,7 +750,7 @@ finding: \emph{what moved Phase~2 past Phase~1 is what the network learned to se
     \hyb{} vs.\ CNN3    & features   & $+0.35$\pp & 110 / 75  & $0.012$ \\
     CNN3 vs.\ RBF/HOG   & neither    & $+1.01$\pp & 417 / 316 & $2.2{\times}10^{-4}$ \\
     \bottomrule
-  \end{tabular}\\[2pt]
+  \end{tabular}}\\[2pt]
   {\footnotesize only A / only B: test images classified correctly by one model only. $p$: McNemar, \cref{eq:mcnemar}.}
 \end{table}
 
@@ -801,15 +785,13 @@ improvement is broad, spanning footwear, trousers and the other tops, which is w
 produces; a targeted fix would have concentrated on Shirt. (iii)~Changing the classifier on top of the learned features
 moves Dress and Coat but not Shirt, and repeats 96.8\% of the shared wrong labels. (iv)~The failures include collarless
 and sleeveless garments that a human annotator could reasonably label either way. More capacity, augmentation or data can
-sharpen decision boundaries but cannot recover a collar two pixels wide or resolve a genuinely ambiguous
-label~\cite{northcutt2021pervasive}; even much larger augmented networks stop near 96\%~\cite{zhong2020random}. We
+sharpen decision boundaries but cannot recover a collar two pixels wide or resolve a genuinely ambiguous label. We
 therefore read 92\% not as a modest CNN result but as evidence that much of the remaining error is close to the limit set
 by the data.
 
-\textbf{Representation over classifier.} The decomposition echoes the transfer-learning literature, in which generic CNN
-activations make simple classifiers competitive~\cite{donahue2014decaf,razavian2014cnn}, and sharpens it for a controlled
-setting: the same kernel machine is 1.36\pp{} better on learned features than on the best handcrafted ones, while the
-choice between kernel machine and softmax layer is worth at most a third of a point.
+\textbf{Representation over classifier.} The decomposition gives a direct answer to the question behind the project:
+the same kernel machine is 1.36\pp{} better on learned features than on the best handcrafted ones, while the choice
+between kernel machine and softmax layer is worth at most a third of a point.
 
 \textbf{Which model to deploy?} For catalog tagging, CNN3: within 0.35\pp{} of the most accurate model, about 0.1\,s per
 1{,}000 images, and under 1\,MB. Among classical models, the 181\,KB Linear SVM on HOG remains the practical choice
@@ -826,7 +808,7 @@ choice between kernel machine and softmax layer is worth at most a third of a po
   \item \textbf{Fixed hyperparameters.} No learning-rate, width or dropout search was run, and three classical models
         selected a value on the edge of their grid; all results are lower bounds for their model families.
   \item \textbf{Optimistic validation.} Validation exceeds test accuracy for every trained model (by 0.02--2.05\pp), the
-        selection bias expected when choosing on validation~\cite{cawley2010overfitting}; we report test scores.
+        selection bias expected when choosing the best of several settings on validation; we report test scores.
   \item \textbf{Timing hardware.} Timings come from an Apple M3 and an M3 Pro; only order-of-magnitude gaps are firm.
   \item \textbf{Label quality.} Our evidence of ambiguous labels is qualitative; no image was relabeled.
 \end{itemize}
@@ -844,7 +826,7 @@ the data, not the choice between handcrafted and learned features.
 
 \textbf{Future work.} (i)~Train over several seeds to bound variance and settle the depth and classifier comparisons.
 (ii)~Refit the \hyb{}'s SVM on 54k images to remove the training-data confound. (iii)~Audit the shared errors with
-confident learning~\cite{northcutt2021pervasive} to estimate how much residual error is label noise. (iv)~Test whether
+a relabeling study to estimate how much residual error is label noise. (iv)~Test whether
 augmentation or higher-resolution inputs move Shirt recall, which would distinguish a capacity limit from an information
 limit.
 
@@ -880,39 +862,21 @@ report.
 % =====================================================================================
 \begin{thebibliography}{99}
 
-\bibitem{lecun2015deep}
-Y.~LeCun, Y.~Bengio, and G.~Hinton, ``Deep learning,'' \emph{Nature}, vol.~521, no.~7553, pp.~436--444, 2015.
-
-\bibitem{krizhevsky2012imagenet}
-A.~Krizhevsky, I.~Sutskever, and G.~E. Hinton, ``ImageNet classification with deep convolutional neural networks,'' in
-\emph{Adv. Neural Inf. Process. Syst. (NeurIPS)}, vol.~25, 2012, pp.~1097--1105.
-
-\bibitem{kaufman2012leakage}
-S.~Kaufman, S.~Rosset, C.~Perlich, and O.~Stitelman, ``Leakage in data mining: Formulation, detection, and avoidance,''
-\emph{ACM Trans. Knowl. Discov. Data}, vol.~6, no.~4, pp.~1--21, 2012.
-
-\bibitem{cawley2010overfitting}
-G.~C.~Cawley and N.~L.~C.~Talbot, ``On over-fitting in model selection and subsequent selection bias in performance
-evaluation,'' \emph{J. Mach. Learn. Res.}, vol.~11, pp.~2079--2107, 2010.
-
-\bibitem{bouthillier2021accounting}
-X.~Bouthillier \emph{et al.}, ``Accounting for variance in machine learning benchmarks,'' in \emph{Proc. Mach. Learn.
-Syst. (MLSys)}, 2021.
+\bibitem{lecun1998gradient}
+Y.~LeCun, L.~Bottou, Y.~Bengio, and P.~Haffner, ``Gradient-based learning applied to document recognition,''
+\emph{Proc. IEEE}, vol.~86, no.~11, pp.~2278--2324, 1998.
 
 \bibitem{xiao2017fashion}
 H.~Xiao, K.~Rasul, and R.~Vollgraf, ``Fashion-MNIST: A novel image dataset for benchmarking machine learning
 algorithms,'' \emph{arXiv preprint arXiv:1708.07747}, 2017.
 
-\bibitem{dalal2005histograms}
-N.~Dalal and B.~Triggs, ``Histograms of oriented gradients for human detection,'' in \emph{Proc. IEEE Conf. Comput.
-Vis. Pattern Recognit. (CVPR)}, 2005, pp.~886--893.
+\bibitem{wilson1927probable}
+E.~B. Wilson, ``Probable inference, the law of succession, and statistical inference,'' \emph{J. Amer. Statist.
+Assoc.}, vol.~22, no.~158, pp.~209--212, 1927.
 
-\bibitem{cortes1995support}
-C.~Cortes and V.~Vapnik, ``Support-vector networks,'' \emph{Mach. Learn.}, vol.~20, no.~3, pp.~273--297, 1995.
-
-\bibitem{fan2008liblinear}
-R.-E.~Fan, K.-W.~Chang, C.-J.~Hsieh, X.-R.~Wang, and C.-J.~Lin, ``LIBLINEAR: A library for large linear
-classification,'' \emph{J. Mach. Learn. Res.}, vol.~9, pp.~1871--1874, 2008.
+\bibitem{mcnemar1947note}
+Q.~McNemar, ``Note on the sampling error of the difference between correlated proportions or percentages,''
+\emph{Psychometrika}, vol.~12, no.~2, pp.~153--157, 1947.
 
 \bibitem{cover1967nearest}
 T.~Cover and P.~Hart, ``Nearest neighbor pattern classification,'' \emph{IEEE Trans. Inf. Theory}, vol.~13, no.~1,
@@ -921,102 +885,31 @@ pp.~21--27, 1967.
 \bibitem{breiman2001random}
 L.~Breiman, ``Random forests,'' \emph{Mach. Learn.}, vol.~45, no.~1, pp.~5--32, 2001.
 
+\bibitem{cortes1995support}
+C.~Cortes and V.~Vapnik, ``Support-vector networks,'' \emph{Mach. Learn.}, vol.~20, no.~3, pp.~273--297, 1995.
+
 \bibitem{pedregosa2011scikit}
 F.~Pedregosa \emph{et al.}, ``Scikit-learn: Machine learning in Python,'' \emph{J. Mach. Learn. Res.}, vol.~12,
 pp.~2825--2830, 2011.
 
+\bibitem{dalal2005histograms}
+N.~Dalal and B.~Triggs, ``Histograms of oriented gradients for human detection,'' in \emph{Proc. IEEE Conf. Comput.
+Vis. Pattern Recognit. (CVPR)}, 2005, pp.~886--893.
+
 \bibitem{vanderwalt2014scikit}
 S.~van der Walt \emph{et al.}, ``scikit-image: Image processing in Python,'' \emph{PeerJ}, vol.~2, p.~e453, 2014.
 
-\bibitem{hubel1962receptive}
-D.~H. Hubel and T.~N. Wiesel, ``Receptive fields, binocular interaction and functional architecture in the cat's visual
-cortex,'' \emph{J. Physiol.}, vol.~160, no.~1, pp.~106--154, 1962.
-
-\bibitem{fukushima1980neocognitron}
-K.~Fukushima, ``Neocognitron: A self-organizing neural network model for a mechanism of pattern recognition unaffected
-by shift in position,'' \emph{Biol. Cybern.}, vol.~36, no.~4, pp.~193--202, 1980.
-
-\bibitem{rumelhart1986learning}
-D.~E. Rumelhart, G.~E. Hinton, and R.~J. Williams, ``Learning representations by back-propagating errors,''
-\emph{Nature}, vol.~323, no.~6088, pp.~533--536, 1986.
-
-\bibitem{lecun1989backpropagation}
-Y.~LeCun \emph{et al.}, ``Backpropagation applied to handwritten zip code recognition,'' \emph{Neural Comput.}, vol.~1,
-no.~4, pp.~541--551, 1989.
-
-\bibitem{lecun1998gradient}
-Y.~LeCun, L.~Bottou, Y.~Bengio, and P.~Haffner, ``Gradient-based learning applied to document recognition,''
-\emph{Proc. IEEE}, vol.~86, no.~11, pp.~2278--2324, 1998.
-
-\bibitem{nair2010rectified}
-V.~Nair and G.~E. Hinton, ``Rectified linear units improve restricted Boltzmann machines,'' in \emph{Proc. Int. Conf.
-Mach. Learn. (ICML)}, 2010, pp.~807--814.
-
-\bibitem{simonyan2015very}
-K.~Simonyan and A.~Zisserman, ``Very deep convolutional networks for large-scale image recognition,'' in \emph{Proc.
-Int. Conf. Learn. Represent. (ICLR)}, 2015.
-
-\bibitem{he2016deep}
-K.~He, X.~Zhang, S.~Ren, and J.~Sun, ``Deep residual learning for image recognition,'' in \emph{Proc. IEEE Conf.
-Comput. Vis. Pattern Recognit. (CVPR)}, 2016, pp.~770--778.
-
-\bibitem{goodfellow2016deep}
-I.~Goodfellow, Y.~Bengio, and A.~Courville, \emph{Deep Learning}. Cambridge, MA, USA: MIT Press, 2016.
-
-\bibitem{zeiler2014visualizing}
-M.~D. Zeiler and R.~Fergus, ``Visualizing and understanding convolutional networks,'' in \emph{Proc. Eur. Conf. Comput.
-Vis. (ECCV)}, 2014, pp.~818--833.
-
-\bibitem{donahue2014decaf}
-J.~Donahue, Y.~Jia, O.~Vinyals, J.~Hoffman, N.~Zhang, E.~Tzeng, and T.~Darrell, ``DeCAF: A deep convolutional activation
-feature for generic visual recognition,'' in \emph{Proc. Int. Conf. Mach. Learn. (ICML)}, 2014, pp.~647--655.
-
-\bibitem{razavian2014cnn}
-A.~S. Razavian, H.~Azizpour, J.~Sullivan, and S.~Carlsson, ``CNN features off-the-shelf: An astounding baseline for
-recognition,'' in \emph{Proc. IEEE Conf. Comput. Vis. Pattern Recognit. Workshops (CVPRW)}, 2014, pp.~806--813.
-
-\bibitem{tang2013deep}
-Y.~Tang, ``Deep learning using linear support vector machines,'' in \emph{ICML Workshop on Challenges in Representation
-Learning}, 2013, arXiv:1306.0239.
-
-\bibitem{srivastava2014dropout}
-N.~Srivastava, G.~Hinton, A.~Krizhevsky, I.~Sutskever, and R.~Salakhutdinov, ``Dropout: A simple way to prevent neural
-networks from overfitting,'' \emph{J. Mach. Learn. Res.}, vol.~15, pp.~1929--1958, 2014.
-
-\bibitem{prechelt1998early}
-L.~Prechelt, ``Early stopping---but when?'' in \emph{Neural Networks: Tricks of the Trade}, ser. Lecture Notes in
-Computer Science, vol.~1524. Berlin, Germany: Springer, 1998, pp.~55--69.
+\bibitem{paszke2019pytorch}
+A.~Paszke \emph{et al.}, ``PyTorch: An imperative style, high-performance deep learning library,'' in \emph{Adv. Neural
+Inf. Process. Syst. (NeurIPS)}, vol.~32, 2019, pp.~8024--8035.
 
 \bibitem{kingma2015adam}
 D.~P. Kingma and J.~Ba, ``Adam: A method for stochastic optimization,'' in \emph{Proc. Int. Conf. Learn. Represent.
 (ICLR)}, 2015.
 
-\bibitem{ioffe2015batch}
-S.~Ioffe and C.~Szegedy, ``Batch normalization: Accelerating deep network training by reducing internal covariate
-shift,'' in \emph{Proc. Int. Conf. Mach. Learn. (ICML)}, 2015, pp.~448--456.
-
-\bibitem{zagoruyko2016wide}
-S.~Zagoruyko and N.~Komodakis, ``Wide residual networks,'' in \emph{Proc. Brit. Mach. Vis. Conf. (BMVC)}, 2016.
-
-\bibitem{zhong2020random}
-Z.~Zhong, L.~Zheng, G.~Kang, S.~Li, and Y.~Yang, ``Random erasing data augmentation,'' in \emph{Proc. AAAI Conf. Artif.
-Intell.}, vol.~34, no.~7, 2020, pp.~13001--13008.
-
-\bibitem{mcnemar1947note}
-Q.~McNemar, ``Note on the sampling error of the difference between correlated proportions or percentages,''
-\emph{Psychometrika}, vol.~12, no.~2, pp.~153--157, 1947.
-
-\bibitem{dietterich1998approximate}
-T.~G. Dietterich, ``Approximate statistical tests for comparing supervised classification learning algorithms,''
-\emph{Neural Comput.}, vol.~10, no.~7, pp.~1895--1923, 1998.
-
-\bibitem{northcutt2021pervasive}
-C.~G. Northcutt, A.~Athalye, and J.~Mueller, ``Pervasive label errors in test sets destabilize machine learning
-benchmarks,'' in \emph{Proc. NeurIPS Datasets and Benchmarks Track}, 2021.
-
-\bibitem{wilson1927probable}
-E.~B. Wilson, ``Probable inference, the law of succession, and statistical inference,'' \emph{J. Amer. Statist.
-Assoc.}, vol.~22, no.~158, pp.~209--212, 1927.
+\bibitem{srivastava2014dropout}
+N.~Srivastava, G.~Hinton, A.~Krizhevsky, I.~Sutskever, and R.~Salakhutdinov, ``Dropout: A simple way to prevent neural
+networks from overfitting,'' \emph{J. Mach. Learn. Res.}, vol.~15, pp.~1929--1958, 2014.
 
 \bibitem{vandermaaten2008tsne}
 L.~van der Maaten and G.~Hinton, ``Visualizing data using t-SNE,'' \emph{J. Mach. Learn. Res.}, vol.~9,
