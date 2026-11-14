@@ -2267,8 +2267,6 @@ A smaller reference list the team can explain is worth more than a long one it c
 **Revisit if**
 The report adds a method or tool that needs its own citation.
 
-
-
 ### D-048 — Report keeps 4 references and no contributions table; contributions live in the README
 - **Date:** 2026-11-14
 - **Phase:** v2/05 — Final Report
