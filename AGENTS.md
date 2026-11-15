@@ -211,7 +211,7 @@ notebooks/      01-05 Phase 1, 06-08 Phase 2: run src/ code, show plots, explain
 data/splits/    val_indices.npy, the fixed validation split (committed)
 models/         CNN checkpoints (gitignored, rebuilt by notebook 06)
 results/        metrics JSONs, summary.csv, summary_all.csv, test_log.csv, training/, figures (committed, written only by code)
-report/         v1/ Phase 1 report and slides; v2/ final report
+report/         v1/ Phase 1 report and slides; v2/ final report, Phase 2 slide deck, team guide
 docs/           source of truth: PRD, architecture, formats, interfaces, decisions, progress, phase files
 .github/        PR template
 ```

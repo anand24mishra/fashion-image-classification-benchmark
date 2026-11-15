@@ -37,7 +37,7 @@ src/          config, utils, data, features, models_linear, models_tree_kernel, 
 notebooks/    01_data_eda … 05_results_analysis (Phase 1), 06_cnn_training … 08_hybrid_cnn_svm (Phase 2)
 data/splits/  val_indices.npy (committed); data/raw/, features/, models/ are gitignored
 results/      metrics/*.json, figures/*.png, training/, summary.csv, summary_all.csv, test_log.csv (committed, code-generated)
-report/       v1/ Phase 1 report and slides; v2/ final report (both phases and the hybrid)
+report/       v1/ Phase 1 report and slides; v2/ final report (both phases and the hybrid), Phase 2 slide deck, team guide
 docs/         prd, architecture, system-design, data-formats, module-interfaces, decisions, progress, phases/v1/, phases/v2/
 AGENTS.md     workflow + rules for every contributor and AI tool
 CONTRIBUTING.md  step-by-step guide + troubleshooting for team members
