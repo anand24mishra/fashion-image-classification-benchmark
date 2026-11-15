@@ -61,7 +61,9 @@ Rules:
 | D-045 | 2026-11-14 | v2/04 | Hybrid result: 92.44%, mostly a features effect; CNN3 stays the recommended model | Active |
 | D-046 | 2026-11-14 | v2/05 | One final report for both phases and the hybrid; slides rebuilt later | Active |
 | D-047 | 2026-11-14 | v2/05 | Report cites only the sources behind the methods, tools and tests used; layout made overflow-safe | Active |
-| D-048 | 2026-11-14 | v2/05 | Report keeps 4 references and no contributions table; contributions live in the README | Active |
+| D-048 | 2026-11-14 | v2/05 | Report keeps 4 references and no contributions table; contributions live in the README | Superseded by D-049 (references) |
+| D-049 | 2026-11-16 | v2/05 | Report cites the three works it builds on; Related Work tells one story; PDF committed | Active |
+| D-050 | 2026-11-16 | v2/05 | Phase 2 slide deck (.pptx) with a slide-by-slide team guide | Active |
 
 ---
 
@@ -2270,7 +2272,7 @@ The report adds a method or tool that needs its own citation.
 ### D-048 — Report keeps 4 references and no contributions table; contributions live in the README
 - **Date:** 2026-11-14
 - **Phase:** v2/05 — Final Report
-- **Status:** Active (narrows D-047)
+- **Status:** Superseded by D-049 for the reference list (the no-contributions-table part still holds)
 - **Type:** assumption
 
 **Context**
@@ -2305,3 +2307,107 @@ Phase 1 and Phase 2 work per person.
 **Revisit if**
 The report quotes a result or method from a specific paper.
 
+### D-049 — Report cites the three works it builds on; Related Work tells one story; PDF committed
+- **Date:** 2026-11-16
+- **Phase:** v2/05 — Final Report
+- **Status:** Active (supersedes the reference list of D-048)
+- **Type:** assumption
+
+**Context**
+The four references of D-048 (the dataset and three software libraries) credited tools but did not place the study in
+the research it continues. The team wanted a short bibliography of only the works the story actually depends on, and a
+Related Work section that reads as one argument instead of a list. The report was then compiled on Overleaf.
+
+**Decision**
+Cite exactly three works: the Fashion-MNIST paper (Xiao et al., 2017), the CNN–SVM paper (Agarap, 2017, which
+replaced a small CNN's softmax output with a linear SVM on Fashion-MNIST) and our own Phase 1 report. Rewrite the
+introduction and Related Work so the three lead to the open question the hybrid answers. Commit the compiled
+`report/v2/report.pdf` and remove the figure copies from `report/v2/`; they stay in `results/figures/`.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Keep the four D-048 references | Credits software but gives no research context; a reader cannot see what question was open |
+| A broad literature review (HOG, SVM, LeNet, AlexNet, DeCAF, Adam, dropout…) | Many citations the team never read closely or used directly; the team asked for only the works the study builds on |
+| Keep the 7 figure copies beside `report.tex` | Duplicates of `results/figures/`; the compiled PDF is now the deliverable, and the `.tex` header lists the files to copy to recompile |
+
+**Why**
+Each reference now does a job in the argument: the benchmark sets the baseline (89.7% for the best pixel model),
+Phase 1 supplies the leak-free classical result (91.08%) and the Shirt problem, and the CNN–SVM paper shows that
+swapping the classifier alone is not obviously useful (SVM 90.72% vs softmax 91.86%) while leaving open how much of a
+CNN's advantage is in its features. Our hybrid closes exactly that gap.
+
+**How it works**
+1. Introduction: one paragraph walks through the three results and ends with the question "features or classifier?".
+2. Related Work and Positioning: one paragraph per reference, each saying what it showed and what it could not, then
+   "This paper": freeze the CNN, reuse Phase 1's RBF SVM, change one component per comparison.
+3. Discussion: a new paragraph reconciles our +0.35 classifier effect with the earlier −1.14 (a jointly trained linear SVM
+   vs a kernel SVM on frozen features; in both, the classifier effect is about a point or less), and notes that the
+   earlier two-layer CNN's 91.86% matches our CNN2's 91.85%.
+4. Methods (HOG, SVM, Adam, dropout, McNemar, Wilson) are still explained with formulas, without citations; software is
+   named in the text.
+5. All seven McNemar comparisons were re-checked: the exact binomial p-value agrees with the χ² approximation.
+
+**Files touched**
+- `report/v2/report.tex`: introduction, Related Work, Phase 1 and hybrid sections, Discussion, Conclusion, bibliography,
+  header comment (how to recompile).
+- `report/v2/report.pdf`: added (compiled on Overleaf).
+- `report/v2/*.png`: removed (copies of `results/figures/`).
+
+**Concepts worth learning**
+- **Positioning:** stating which prior result a study extends and which open question it answers.
+- **Ablation:** changing one component at a time so each effect can be measured on its own.
+
+**Revisit if**
+The report is submitted to a venue that expects a full literature review, or a new experiment builds on other work.
+
+### D-050 — Phase 2 slide deck (.pptx) with a slide-by-slide team guide
+- **Date:** 2026-11-16
+- **Phase:** v2/05 — Final Report
+- **Status:** Active
+- **Type:** tooling
+
+**Context**
+The team needs a Phase 2 presentation for the final viva that is visual rather than text-heavy, and a study guide that
+explains every slide so any member can answer questions on any part. The old v2 slide source (`ppt.md`, built through
+NotebookLM) had been removed in D-046.
+
+**Decision**
+Build `report/v2/phase2_presentation.pptx` (31 slides, 16:9) directly as a PowerPoint file, and rewrite
+`report/v2/presentation.md` to follow it slide by slide. Team names appear only on the title slide; who presents which
+slide is recorded in `presentation.md`.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Markdown source for NotebookLM, as in Phase 1 | Generated layouts and charts are hard to control; numbers can drift from the results |
+| Slides as images pasted from matplotlib | Charts could not be edited in PowerPoint; inconsistent styling |
+| Presenter names on each part's slides | The team wanted one clean deck; the guide carries the presenter map |
+
+**Why**
+A native deck keeps every chart editable and every number traceable to `results/`; pairing it with a slide-by-slide guide
+means the deck stays light while the reasoning is still written down for preparation.
+
+**How it works**
+- Structure: opening (title, three questions and answers), five parts each with a divider (problem and protocol; how a
+  CNN works and the two networks; test results, significance and cost; the hybrid; error analysis and conclusion),
+  limitations, and a closing "numbers to remember" slide.
+- Eight native charts (pixels vs HOG, validation choice, parameters by layer, test accuracy, log-scale speed, features
+  vs classifier, per-class recall) use numbers from `results/summary_all.csv` and the metrics JSONs; figures come from
+  `results/figures/`.
+- One colour per model family throughout: classical terracotta, CNN teal, hybrid violet.
+- Each slide's speaker notes start with "Guide: report/v2/presentation.md, Slide N"; `presentation.md` has a slide map
+  (number, title, content, presenter, guide section) and one "Slide N · title" section per content slide with what is
+  on it and what to say.
+- The generator script is not committed (lean repo); the deck is edited directly in PowerPoint from here on.
+
+**Files touched**
+- `report/v2/phase2_presentation.pptx`: added.
+- `report/v2/presentation.md`: rewritten slide by slide; Prologue, Chapter 1, decision map, cheat sheet and glossary kept.
+
+**Concepts worth learning**
+- **One message per slide:** each slide title states its conclusion; the chart or diagram is the evidence.
+- **Native charts:** charts stored as data inside the deck, so they stay editable and sharp.
+
+**Revisit if**
+The numbers in `results/` change, or the viva format (time, number of presenters) changes.

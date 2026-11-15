@@ -43,7 +43,7 @@ macro F1 0.9208 vs `rbf_svm_hog` 91.08% / 0.9108; Shirt recall unchanged (75.1% 
 - [x] 03.4 — final docs check, fill the phase summary; tag `v2.0.0` after merge → `docs(phase-v2-03): close phase`
 
 ## Done criteria
-- [ ] Report compiles; slides exported to PDF. (Pending: compile `report/v2/report.tex` on Overleaf and build the slides from `report/v2/ppt.md`; both PDFs go in `report/v2/`.)
+- [x] Report compiles; slides built. (Done later in v2/05: `report/v2/report.pdf` (D-049) and `report/v2/phase2_presentation.pptx` (D-050).)
 - [x] Every number in README, report and slides matches `summary_all.csv` and the JSONs.
 - [x] A fresh clone runs notebooks 01–07 top-to-bottom with no errors.
 - [x] Docs match what was built; decisions logged.
