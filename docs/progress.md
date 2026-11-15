@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** v2 complete (v2/01–v2/05 done and merged). v2/01 and v2/02 done. **v1 is complete** and tagged `v1.0.0`. v2 (Capstone Phase 2, CNN) is planned.
+**Current phase:** none: **v1** (tagged `v1.0.0`) and **v2** (v2/01–v2/05, CNNs and hybrid) are complete. Final report, Phase 2 slide deck and team guide are in `report/v2/`.
 **Branch:** main
 **Profile:** lean
 
@@ -30,6 +30,11 @@ reviewed by the repo owner (with Claude Code) against the phase file and docs �
 each phase starts. Full workflow: [`AGENTS.md`](../AGENTS.md) §6.
 
 ## Session log
+### 2026-11-16 (v2 final polish)
+- Report references cut to the three works the study builds on (Fashion-MNIST, the CNN–SVM paper, our Phase 1 report), Related Work rewritten around them, report compiled to `report/v2/report.pdf`; figure copies removed from `report/v2/` (D-049).
+- Phase 2 slide deck `report/v2/phase2_presentation.pptx` (31 slides, native charts) built; `presentation.md` rewritten slide by slide with a slide map and presenters; names only on the title slide (D-050).
+- README rewritten as the project's front page; all docs re-checked for consistency.
+
 ### 2026-11-14 (v2/05 final report)
 - `report/v2/report.tex` rewritten as one paper for Phase 1, Phase 2 and the hybrid, with an author-contributions table; every number recomputed from the saved results. Old v2 slide source and walkthrough removed (D-046).
 - Report references cut to 4 (dataset and the three libraries used), contributions table moved out of the report to the README (D-047, D-048); layout made overflow-safe. Phase 2 contribution split agreed. All repo docs audited for consistency (CLAUDE.md, AGENTS.md, CONTRIBUTING.md, PRD, formats, design note, phase files).
@@ -134,7 +139,6 @@ each phase starts. Full workflow: [`AGENTS.md`](../AGENTS.md) §6.
 
 ## Parked ideas
 <!-- Out-of-scope ideas that came up while building. Never built without approval. -->
-- IEEE LaTeX report (`report/`) and presentation slides inside the repo. Planned after v1 code is done.
 - PCA-reduced pixels as a third feature set (faster SVM/kNN; curse-of-dimensionality demo).
 - LBP texture features; L1 vs L2 Logistic Regression.
 - v2 extras left out of scope: dropout-off ablation, first-layer

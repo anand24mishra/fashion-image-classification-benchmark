@@ -1,11 +1,12 @@
 % =====================================================================================
 % Handcrafted, Learned, or Both? -- Capstone Final Report (Phases 1 and 2, IEEE conference format)
 %
-% COMPILE (Overleaf):
-%   1. New project -> Upload project -> upload report/v2/ as a .zip (or report.tex + the 7 PNGs beside it).
-%   2. Set report.tex as the main document. The PNGs are copies of results/figures/; if a figure is regenerated,
-%      copy it here again.
-%   3. Compiler: pdfLaTeX. IEEEtran, TikZ and pgfplots ship with Overleaf.
+% COMPILED OUTPUT: report.pdf (same folder).
+% TO RECOMPILE (Overleaf, pdfLaTeX): upload report.tex together with these 7 figures, copied from results/figures/:
+%     eda_class_mean_images.png, results_pixels_vs_hog.png, cnn_training_curves.png, errors_confusion_cnn3_images.png,
+%     errors_misclassified_rbf_svm_hog_shirt_vs_t-shirt_top.png, errors_misclassified_cnn3_images_shirt_vs_t-shirt_top.png,
+%     hybrid_recall_vs_cnn3.png
+%   IEEEtran, TikZ and pgfplots ship with Overleaf.
 %
 % Every number comes from results/summary_all.csv, results/metrics/*.json, results/training/*.csv, the saved test
 % predictions and the outputs of notebooks 01-08. Confidence intervals (Wilson, 95%) and McNemar tests were computed
@@ -85,9 +86,9 @@ ${\sim}377\times$ smaller: H1 holds. H2 fails: Shirt recall is unchanged (75.1\%
 shirts rather than fix them. Finally, a \emph{hybrid} that feeds the CNN's 128 learned features to the same RBF SVM
 separates representation from classifier: it reaches 92.44\%, the best result in the study. Holding the classifier fixed,
 learned features add 1.36 percentage points over HOG ($p=5.2\times10^{-7}$); holding the features fixed, the SVM adds
-only 0.35 points over the CNN's own softmax layer ($p=0.012$). The gain is a property of the representation, and the
-residual error---shared, with the same wrong label, by models that see the image in entirely different ways---is a
-property of the $28\times28$ data.
+only 0.35 points over the CNN's own softmax layer ($p=0.012$). The gain is largely a property of the representation, and the
+residual error---shared, with the same wrong label, by models that see the image in entirely different ways---appears
+to be a property of the $28\times28$ data.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -104,13 +105,23 @@ and \emph{why} they help, can only be judged against a strong, honestly evaluate
 the test set for a decision, trains every model on the same data, and reports uncertainty and paired tests rather than
 single accuracy numbers.
 
+Fashion-MNIST~\cite{xiao2017fashion} was released as a harder drop-in replacement for MNIST, together with a benchmark of
+classical classifiers on raw pixels whose best entry, an RBF support vector machine, reached 89.7\%. Our Phase~1
+study~\cite{phase1report} revisited that classical baseline under a leak-free protocol, added handcrafted gradient
+features, and raised it to 91.08\%, but found that no classical model recognizes shirts reliably. On the deep-learning
+side, Agarap~\cite{agarap2017cnnsvm} replaced the softmax output of a small CNN with an SVM and found it slightly
+\emph{worse} on Fashion-MNIST (90.72\% vs.\ 91.86\%). Together these results leave a question open. A CNN differs from a
+kernel machine on handcrafted features in two ways at once---it \emph{learns} its features, and it \emph{decides} with a
+different classifier---so when it wins, which of the two is responsible? Comparisons that change both components at once
+cannot say.
+
 \textbf{Problem statement.} Given the 70{,}000 grayscale $28\times28$ images of Fashion-MNIST~\cite{xiao2017fashion} in ten
 garment classes, we ask (a)~how far fixed, handcrafted representations go; (b)~whether a small learned representation
 goes further, and on which classes; and (c)~whether any improvement comes from the learned \emph{features} or from the
 \emph{classifier} trained with them---all under a single protocol in which every choice is made on validation data and
 the test set is touched once per experiment. The study ran in two phases:
 \begin{itemize}
-  \item \textbf{Phase~1 (classical).} \RQ{1}: How accurate is classical ML on raw pixels? \RQ{2}: Do HOG features beat
+  \item \textbf{Phase~1 (classical,~\cite{phase1report}).} \RQ{1}: How accurate is classical ML on raw pixels? \RQ{2}: Do HOG features beat
         pixels, and for which models? \RQ{3}: Which model gives the best accuracy--speed--size trade-off? \RQ{4}: Which
         classes are confused, and why do handcrafted features fail there?
   \item \textbf{Phase~2 (deep).} \RQ{5}: Does a small CNN beat the best classical model? \RQ{6}: Does it reduce the
@@ -133,7 +144,8 @@ likewise fixed and committed before it was run.
   \item A controlled test of a pre-registered mechanism (H2) with paired significance tests and image-level agreement
         analysis, showing that the CNN's gain is real but does not arise where predicted.
   \item A \emph{feature--classifier decomposition}: by moving one component at a time between the best classical
-        model and the CNN, we attribute most of the deep-learning gain to the representation.
+        model and the CNN, we attribute most of the deep-learning gain to the representation, and we reconcile this
+        with the earlier CNN--SVM result on the same dataset~\cite{agarap2017cnnsvm}.
   \item Evidence that the residual error is dominated by images that independent models misclassify identically, a
         ceiling that neither representation crosses.
 \end{enumerate}
@@ -142,6 +154,12 @@ likewise fixed and committed before it was run.
 magnitude cheaper (H1 supported), but Shirt recall does not move (H2 rejected). The hybrid reaches 92.44\%; learned
 features account for most of the improvement, the classifier for a small, validation-invisible remainder.
 \Cref{tab:headline} summarizes the three representative models.
+
+\textbf{Organization.} \Cref{sec:related} positions the study against the three works it builds on.
+\Cref{sec:background} fixes notation and the statistical tools; \cref{sec:protocol} describes the shared protocol.
+\Cref{sec:phase1,sec:phase2,sec:hybrid} follow the study in the order it was run---classical pipelines, CNNs, and the
+hybrid that separates features from classifier---and \cref{sec:discussion,sec:conclusion} interpret the results and
+their limits.
 
 \begin{table}[t]
   \centering
@@ -160,6 +178,39 @@ features account for most of the improvement, the classifier for a small, valida
   \end{tabular}}\\[2pt]
   {\footnotesize Shirt: recall (\%). ms/1k: end-to-end prediction time per 1{,}000 images, including feature extraction.}
 \end{table}
+
+% =====================================================================================
+\section{Related Work and Positioning}
+\label{sec:related}
+The study builds on three lines of evidence, one per reference, and is designed to answer the question they leave open.
+
+\textbf{The benchmark.} Xiao et al.~\cite{xiao2017fashion} built Fashion-MNIST to keep MNIST's format---70{,}000
+grayscale $28\times28$ images, ten balanced classes, a fixed 60k/10k split---while removing its ceiling: classifiers that
+are nearly perfect on digits fall well below that on garments. Their benchmark of scikit-learn classifiers on raw pixels,
+led by an RBF SVM at 89.7\%, is the natural reference for classical pixel pipelines. It reports test accuracy across
+grids of settings, without a separate validation split or confidence intervals, which is appropriate for introducing a
+dataset but not for deciding whether one model is better than another.
+
+\textbf{The classical baseline.} Our Phase~1 study~\cite{phase1report} supplied that missing discipline. It fixed a
+stratified validation split, moved every choice onto it, read the test set once per experiment through a logged
+function, and compared five classifiers on raw pixels and on Histograms of Oriented Gradients (HOG). Its pixel RBF SVM
+reproduces the benchmark's 89.7\%; HOG raises the best model to 91.08\%. Its error analysis found Shirt to be the
+hardest class for every model and the four upper-body garments to account for most errors, and it closed with two
+falsifiable hypotheses about what a CNN would change (\cref{sec:intro}). The present paper inherits its split,
+evaluation code and audit log unchanged, so every number reported here is directly comparable with it.
+
+\textbf{CNN features and SVM classifiers.} Agarap~\cite{agarap2017cnnsvm} asked whether an SVM is a better output layer
+than softmax for a CNN. A two-convolutional-layer network was trained end to end on MNIST and Fashion-MNIST with either
+a softmax or a linear SVM objective on top; on Fashion-MNIST the SVM variant scored 90.72\% against 91.86\% for softmax.
+Because the SVM is trained \emph{jointly} with the network, the two variants end up with different features as well as
+different classifiers, and the SVM is linear, so it cannot draw the curved boundaries a kernel provides. The result
+therefore shows that replacing the softmax does not automatically help; it does not say how much of a CNN's advantage
+lies in its features.
+
+\textbf{This paper.} We close that gap with a controlled design. The CNN is trained once and then \emph{frozen}, and its
+features are passed to the same RBF SVM, with the same grid and protocol, that Phase~1 used on HOG. Each comparison then
+changes exactly one component, so the effect of learned features and the effect of the classifier can be measured
+separately, on the same split and with paired significance tests (\cref{sec:hybrid}).
 
 % =====================================================================================
 \section{Problem Formulation and Background}
@@ -215,9 +266,7 @@ and decides each one-vs-one binary problem by
 \end{equation}
 so its cost is proportional to the number of support vectors $|\mathcal{S}|$ times the
 feature dimension. scikit-learn's default bandwidth $\gamma=\texttt{scale}$ is $1/(d\cdot\operatorname{Var}[\mathbf{X}])$.
-$k$-NN, Random Forest, the SVMs and Logistic
-Regression come from scikit-learn~\cite{pedregosa2011scikit}, HOG from
-scikit-image~\cite{vanderwalt2014scikit}, and the CNNs are built in PyTorch~\cite{paszke2019pytorch}.
+All classical models use scikit-learn, HOG uses scikit-image, and the CNNs are built in PyTorch.
 
 \subsection{Convolutional Networks}
 \textbf{Convolution.} A layer with $F$ filters of size $k\times k$ over $C$ input channels computes
@@ -340,6 +389,8 @@ the lowest recall and that most errors would fall within the upper-body group.
 % =====================================================================================
 \section{Phase 1: Classical Pipelines}
 \label{sec:phase1}
+This section summarizes the Phase~1 study~\cite{phase1report}: the classical results that Phase~2 must beat, and the
+error pattern that motivated its hypotheses.
 
 \subsection{Representations and Tuning}
 \textbf{Pixels} are the flattened 784-dimensional image; flattening discards which pixels are neighbors. \textbf{HOG}
@@ -379,7 +430,7 @@ Regression\,/\,HOG (0.8927).
 
 \subsection{Results (RQ1--RQ3)}
 \Cref{tab:results} reports all experiments of both phases. \textbf{RQ1:} the best pixel model is the RBF SVM at 89.70\%,
-in line with the published scikit-learn baselines~\cite{xiao2017fashion}; the linear models reach only 83.78--84.72\%,
+matching the best pixel model of the original benchmark~\cite{xiao2017fashion}; the linear models reach only 83.78--84.72\%,
 because a single pixel records brightness at one location and a linear boundary in pixel space cannot express shape.
 \textbf{RQ2:} HOG helps linear models most---$+5.20$\pp{} for the Linear SVM and $+4.14$\pp{} for Logistic
 Regression---and lifts the RBF SVM by $+1.38$\pp{} to 91.08\% (\cref{fig:pixhog}). It does not help Random Forest
@@ -562,12 +613,12 @@ The CNN is also far cheaper. CNN3 classifies 1{,}000 images in 94\,ms against ${
 a ${\sim}300\times$ speed-up, from a 0.97\,MB model ${\sim}377\times$ smaller than the SVM's 366\,MB of support vectors.
 The SVM's cost grows with its training set; the CNN's is fixed by its architecture. Within the CNNs, prediction time
 tracks MACs rather than parameters: CNN3 is 43\% smaller but 62\% slower than CNN2. \Cref{fig:pareto} shows that both
-networks are more accurate \emph{and} faster end to end than every classical model except the Random Forest on pixels,
-which is faster (12\,ms) but 4.3\pp{} less accurate than CNN2.
+networks are more accurate \emph{and} faster end to end than every classical model except the two cheapest pixel models,
+the Random Forest (12\,ms) and the Linear SVM (1.2\,ms), which are faster but 4.3\pp{} and 8.1\pp{} less accurate than CNN2.
 
 \begin{figure}[t]
   \centering
-  \begin{tikzpicture}
+  \begin{tikzpicture}[lbl/.style={font=\tiny, inner sep=1.5pt}]
     \begin{semilogxaxis}[
       width=\linewidth, height=6.4cm,
       xlabel={End-to-end prediction time per 1{,}000 images (ms, log scale)},
@@ -576,7 +627,6 @@ which is faster (12\,ms) but 4.3\pp{} less accurate than CNN2.
       grid=both, grid style={gray!20}, minor grid style={gray!8},
       tick label style={font=\scriptsize}, label style={font=\footnotesize},
       legend style={font=\scriptsize, at={(0.02,0.03)}, anchor=south west},
-      lbl/.style={font=\tiny, inner sep=1.5pt},
     ]
       \addplot[only marks, mark=o, mark size=2pt, blue!70!black] coordinates {
         (12.16,87.56) (6926.61,86.11) (4766.94,89.70)};
@@ -603,7 +653,7 @@ which is faster (12\,ms) but 4.3\pp{} less accurate than CNN2.
     \end{semilogxaxis}
   \end{tikzpicture}
   \caption{Accuracy vs.\ end-to-end prediction time (feature extraction included). The CNNs sit alone in the
-  upper-left corner; the hybrid buys 0.35\pp{} over CNN3 for ${\sim}6\times$ the time. Linear SVM on pixels (1.2\,ms,
+  upper-left corner; the hybrid buys 0.35\pp{} over CNN3 for ${\sim}6.5\times$ the time. Linear SVM on pixels (1.2\,ms,
   83.78\%) lies left of the axis; Logistic Regression timings are not comparable and are omitted.}
   \label{fig:pareto}
 \end{figure}
@@ -667,7 +717,9 @@ button placket is visible, which the SVM misses, while the SVM correctly classif
 
 \subsection{Motivation and Method}
 CNN3 differs from the RBF SVM on HOG in \emph{two} ways: its features are learned instead of fixed, and its classifier is
-a softmax layer instead of a kernel machine. A gain could come from either. Writing CNN3 as $f=h_{\text{soft}}\circ\phi$,
+a softmax layer instead of a kernel machine. A gain could come from either. Agarap~\cite{agarap2017cnnsvm} swapped the
+classifier but retrained the network with it, so features and classifier changed together; we instead freeze the
+features and swap only the classifier. Writing CNN3 as $f=h_{\text{soft}}\circ\phi$,
 with
 \begin{equation}
   \begin{gathered}
@@ -758,12 +810,21 @@ produces; a targeted fix would have concentrated on Shirt. (iii)~Changing the cl
 moves Dress and Coat but not Shirt, and repeats 96.8\% of the shared wrong labels. (iv)~The failures include collarless
 and sleeveless garments that a human annotator could reasonably label either way. More capacity, augmentation or data can
 sharpen decision boundaries but cannot recover a collar two pixels wide or resolve a genuinely ambiguous label. We
-therefore read 92\% not as a modest CNN result but as evidence that much of the remaining error is close to the limit set
-by the data.
+therefore read 92\% not as a modest CNN result but as evidence that much of the remaining error may lie close to the limit set
+by the data. This is an inference from shared errors, not a measured ceiling; Future work~(iii) proposes the test.
 
 \textbf{Representation over classifier.} The decomposition gives a direct answer to the question behind the project:
 the same kernel machine is 1.36\pp{} better on learned features than on the best handcrafted ones, while the choice
-between kernel machine and softmax layer is worth at most a third of a point.
+between kernel machine and softmax layer is worth about a third of a point, which may be within seed variation.
+
+\textbf{Relation to the earlier CNN--SVM result.} Agarap~\cite{agarap2017cnnsvm} found an SVM output layer
+1.14\pp{} \emph{worse} than softmax on Fashion-MNIST; we find an SVM on frozen features 0.35\pp{} \emph{better}. The two
+findings are compatible. There the SVM was linear and trained jointly with the network, so its features differed too;
+here it is a kernel machine on fixed features. In both studies the effect of the classifier is about one point or less,
+and its sign depends on how the classifier is attached---whereas the effect of the representation, measured with the
+classifier held fixed, is larger and highly significant. Independently, that study's two-layer CNN with softmax reached
+91.86\%, within 0.01\pp{} of our two-block CNN2 (91.85\%) under a different training protocol, which suggests that our
+CNN results are typical of networks of this size rather than an artifact of our setup.
 
 \textbf{Which model to deploy?} For catalog tagging, CNN3: within 0.35\pp{} of the most accurate model, about 0.1\,s per
 1{,}000 images, and under 1\,MB. Among classical models, the 181\,KB Linear SVM on HOG remains the practical choice
@@ -792,9 +853,12 @@ Under one protocol that holds the split, the test set and the evaluation code fi
 tuned classical pipeline reaches 91.08\% on Fashion-MNIST; a three-block CNN with fewer than a quarter of a million
 parameters reaches 92.09\% at ${\sim}1/300$ of the prediction time and ${\sim}1/377$ of the size; and the RBF SVM trained on
 the CNN's own features reaches 92.44\%. The CNN wins (H1), but not by fixing the shirts (H2): the gain is broad, comes
-overwhelmingly from the learned representation rather than the classifier, and stops at a residual error that models
-with entirely different views of the image share, label for label. The limiting factor is the resolution and labeling of
-the data, not the choice between handcrafted and learned features.
+mostly from the learned representation rather than the classifier, and stops at a residual error that models
+with entirely different views of the image share, label for label. The evidence points to the resolution and labeling of
+the data, rather than the choice between handcrafted and learned features, as the binding constraint; we have not tested
+this directly. Read together with the original benchmark~\cite{xiao2017fashion}, our Phase~1 study~\cite{phase1report}
+and the earlier CNN--SVM comparison~\cite{agarap2017cnnsvm}, the results give a consistent picture: careful protocol
+moves classical models by about a point, learned features by about another, and the choice of classifier by less.
 
 \textbf{Future work.} (i)~Train over several seeds to bound variance and settle the depth and classifier comparisons.
 (ii)~Refit the \hyb{}'s SVM on 54k images to remove the training-data confound. (iii)~Audit the shared errors with
@@ -808,22 +872,20 @@ log and a decision log recording the reason for every choice are available at
 a fresh clone runs all eight notebooks in about two minutes and regenerates every reported number.
 
 % =====================================================================================
-\begin{thebibliography}{99}
+\begin{thebibliography}{3}
 
 \bibitem{xiao2017fashion}
 H.~Xiao, K.~Rasul, and R.~Vollgraf, ``Fashion-MNIST: A novel image dataset for benchmarking machine learning
 algorithms,'' \emph{arXiv preprint arXiv:1708.07747}, 2017.
 
-\bibitem{pedregosa2011scikit}
-F.~Pedregosa \emph{et al.}, ``Scikit-learn: Machine learning in Python,'' \emph{J. Mach. Learn. Res.}, vol.~12,
-pp.~2825--2830, 2011.
+\bibitem{phase1report}
+T.~Singh, A.~Mishra, R.~Sanyal, R.~Srivastav, and O.~Nagre, ``How far can classical machine learning go on
+Fashion-MNIST? A leak-free benchmark of raw pixels vs.\ HOG features, with cost and error analysis,'' Capstone Project
+Report (Phase~1), Newton School of Technology, Rishihood University, 2026.
 
-\bibitem{vanderwalt2014scikit}
-S.~van der Walt \emph{et al.}, ``scikit-image: Image processing in Python,'' \emph{PeerJ}, vol.~2, p.~e453, 2014.
-
-\bibitem{paszke2019pytorch}
-A.~Paszke \emph{et al.}, ``PyTorch: An imperative style, high-performance deep learning library,'' in \emph{Adv. Neural
-Inf. Process. Syst. (NeurIPS)}, vol.~32, 2019, pp.~8024--8035.
+\bibitem{agarap2017cnnsvm}
+A.~F.~Agarap, ``An architecture combining convolutional neural network (CNN) and support vector machine (SVM) for
+image classification,'' \emph{arXiv preprint arXiv:1712.03541}, 2017.
 
 \end{thebibliography}
 

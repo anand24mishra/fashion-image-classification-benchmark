@@ -146,7 +146,7 @@ flowchart LR
 
 New layout entries: `src/cnn.py`; `notebooks/06_cnn_training.ipynb` (training, model choice, the two test runs),
 `notebooks/07_cnn_vs_classical.ipynb` (comparison and error analysis from saved files); `results/training/`;
-`results/summary_all.csv`; `models/` (gitignored); `report/v2/`. v2/04 adds `notebooks/08_hybrid_cnn_svm.ipynb` and the
+`results/summary_all.csv`; `models/` (gitignored); `report/v2/` (final report `.tex`/`.pdf`, slide deck, team guide). v2/04 adds `notebooks/08_hybrid_cnn_svm.ipynb` and the
 `cnn` feature set (`features/cnn3_*.npy`, from `cnn.extract_cnn_features`), which `features.py` builds from the CNN3
 checkpoint; `features` therefore depends on `cnn` (D-044).
 

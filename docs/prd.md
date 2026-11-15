@@ -38,7 +38,7 @@ Measurable outcomes:
 - No web app, API, deployment or model serving.
 - No experiment-tracking platforms (MLflow, W&B), Docker, CI or committed tests (lean profile).
 - No advanced code architecture. Plain functions in a few small modules, plus notebooks.
-- The LaTeX report and slides are not built in this plan. They will go in the repo later (parked).
+- The LaTeX report and slides are not built in this plan. They will go in the repo later (parked; since built: `report/v1/` and `report/v2/`).
 
 ## 5. Features
 ### Must have (v1)
@@ -68,7 +68,7 @@ Measurable outcomes:
 ### Later / maybe
 - PCA-reduced pixels as a third feature set (speeds up SVM/kNN, shows the curse of dimensionality).
 - LBP texture features; L1 vs L2 Logistic Regression.
-- IEEE LaTeX report and slides inside `report/` (parked; planned after the code is done).
+- IEEE LaTeX report and slides inside `report/` (built after the code: `report/v1/`, `report/v2/`).
 - Phase 2 (v2): small CNN using the same split and `evaluate()`, ablations, a hybrid CNN-features → SVM model.
 
 ## 6. Core user flows
@@ -130,7 +130,7 @@ v2 asks whether that closes the gap, measured on exactly the same split, test se
 | F-18 | Model choice on val | Training curves for both CNNs; the final CNN is chosen by val accuracy before any test run (D-035). |
 | F-19 | CNN test evaluation | `final_test_run_cnn()` scores each CNN once with the shared `evaluate()`: accuracy, macro F1, per-class recall, parameter count, inference time. `test_log.csv` gains exactly 2 rows; `results/summary_all.csv` has 14 rows; Phase 1 files unchanged. |
 | F-20 | AML vs CNN comparison and error analysis | Side-by-side metrics vs `rbf_svm_hog`, confusion matrices, misclassified-image grids for the same class pairs from both models, model agreement, and a written answer to RQ5–RQ8. Reads saved predictions only. |
-| F-21 | Write-up | README Phase 2 section and one final IEEE LaTeX report in `report/v2/` covering both phases and the hybrid (D-046); slides follow from the report. |
+| F-21 | Write-up | README Phase 2 section and one final IEEE LaTeX report in `report/v2/` covering both phases and the hybrid (D-046), compiled to `report.pdf`; a Phase 2 slide deck (`phase2_presentation.pptx`) and a slide-by-slide team guide (`presentation.md`) built from it (D-050). |
 | F-22 | Hybrid CNN features + RBF SVM | CNN3's 128 last-hidden-layer features feed the RBF SVM under the Phase 1 protocol (`rbf_svm_cnn`, D-044); tested once; `test_log.csv` 15 rows, `summary_all.csv` 15 rows, `summary.csv` unchanged. |
 
 ### 10.4 Non-goals (v2)

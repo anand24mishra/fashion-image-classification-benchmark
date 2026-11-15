@@ -31,7 +31,7 @@ experiments in `test_log.csv` and `summary_all.csv`.
 - [x] 05.1 — final report, remove the old slide source and walkthrough, README/docs → `docs(report): final report covering both phases and the hybrid`
 
 ## Done criteria
-- [ ] Report compiles on Overleaf (pending: LaTeX is not installed locally).
+- [x] Report compiles on Overleaf (`report/v2/report.pdf`, D-049).
 - [x] Every number cross-checked against the saved results.
 - [x] Docs match what was built; decision logged.
 
@@ -43,4 +43,4 @@ experiments in `test_log.csv` and `summary_all.csv`.
   shares, dead-unit count and `gamma="scale"` for the CNN features.
 - **Added:** the 7 report figures copied next to `report.tex` (folder uploads to Overleaf as is); `report/v2/presentation.md`, the
   end-to-end team walkthrough (story, five presenter parts, likely questions, decision map, cheat sheet).
-- **Next:** compile on Overleaf; confirm the Phase 2 contribution split; rebuild slides from the report.
+- **Follow-up (2026-11-16):** references cut to three (Fashion-MNIST, the CNN–SVM paper, our Phase 1 report), report compiled to `report.pdf` and figure copies removed (D-049); slides rebuilt as `report/v2/phase2_presentation.pptx` with `presentation.md` as the slide-by-slide guide (D-050).
