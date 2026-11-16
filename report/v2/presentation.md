@@ -55,7 +55,7 @@ Names appear only on the title slide; who presents each slide is recorded here, 
 | 28 | Why H2 failed: an information problem | Four evidence cards | Omved | Part 5 · Slide 28 |
 | 29 | Conclusion | 91.08% → 92.09% → 92.44%; H1, H2, deploy CNN3 | Omved | Part 5 · Slide 29 |
 | 30 | Limits we know about, and what to try next | Limitations and future work | Omved | Part 5 · Slide 30 |
-| 31 | Thank you | Numbers to remember; questions | All | Cheat sheet |
+| 31 | Thank you | Numbers to remember; questions | Omved, then all for questions | Part 5 · Slide 31 |
 
 Where things live:
 
@@ -71,7 +71,7 @@ Where things live:
 | Every test-set access | `results/test_log.csv` (15 rows) |
 | Why each choice was made | `docs/decisions.md` (D-001 to D-050) |
 
-Each slide also carries short speaker notes in the deck that point back to the matching section of this guide.
+Every slide below ends with a **Speaker notes** block: who presents it and exactly what to say. The same text, word for word, is in the deck's speaker notes. Study the slide sections here; read from the speaker notes while presenting.
 
 ---
 
@@ -206,6 +206,16 @@ enrollment numbers, and a grid of ten training images per class.
 **What to say:** A shop needs an accurate, fast and small clothing tagger. Phase 1 gave us the strongest classical answer.
 Phase 2 asks whether a small network that learns its own features does better, where it does better, and why.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Tanmay Singh
+
+> Good morning. We are Tanmay Singh, Anand Mishra, Rajdeep Sanyal, Rajat Srivastav and Omved Nagre.
+>
+> Picture an online clothing shop that wants to tag product photos automatically. The tagger must be accurate, fast and small.
+>
+> In Phase 1 we built the strongest classical answer. In Phase 2 we ask: does a small CNN that learns its own features do better, where does it do better, and why?
+>
+> These are real Fashion-MNIST images: 28 by 28 grayscale, ten clothing classes.
+
 ### Slide 2 · Three questions, three answers
 **On the slide:** three cards, one per question, each with its headline number: **91.08%** (best classical),
 **92.09%** (CNN3), **+1.36 points** (learned features, against +0.35 from the classifier). Tagline: learned features
@@ -214,11 +224,28 @@ win on accuracy, speed and size, but the hardest errors live in the data.
 **What to say:** Give the three answers up front (the Prologue's five beats). Everything after this slide shows how we
 got them honestly.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Tanmay Singh
+
+> Here is the whole story in three answers.
+>
+> One: handcrafted features go far. An RBF SVM on HOG features reaches 91.08%, the best of 12 classical experiments.
+>
+> Two: a small CNN does better. CNN3 reaches 92.09%, a statistically significant gain, and it is about 300 times faster and 377 times smaller. But it does not fix the hardest class, Shirt.
+>
+> Three: the gain comes from the features. Learned features add 1.36 points; swapping the classifier adds only 0.35.
+>
+> The rest of the talk shows how we got each number honestly.
+
 ---
 
 ## Part 1 — slides 3 to 9: the problem, the protocol and training the CNN (Tanmay Singh)
 
-Slide 3 is the Part 1 divider: it lists the five topics below.
+### Slide 3 · Part 1 divider
+**On the slide:** the five topics of Part 1.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Tanmay Singh
+
+> Part 1 sets the stage: Phase 1 in one slide, the two predictions we wrote down before training, the evaluation rules, how we trained the network, and how we chose CNN3.
 
 ### Slide 4 · Phase 1 left a strong baseline and one weak class
 **On the slide:** a bar chart of test accuracy for the five classical models on pixels (grey) and HOG (terracotta), and
@@ -230,6 +257,14 @@ for every classical model).
   SVM by +1.38 to 91.08%. It does not help Random Forest or k-NN (Chapter 1, 1.7).
 - The weak spot is **Shirt**: 50.9–75.2% recall across models, confused with T-shirt/top, Pullover and Coat.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Tanmay Singh
+
+> Phase 1 compared classical models on raw pixels and on HOG, a handcrafted description of edge directions.
+>
+> HOG helps the linear models most: plus 5.20 points for the linear SVM, plus 4.14 for logistic regression. It lifts the RBF SVM by 1.38 points to 91.08%, our best classical model, chosen on validation at 0.9157. It does not help Random Forest or k-NN.
+>
+> The weak spot is Shirt: recall between 50.9% and 75.2% across models. Shirts get confused with T-shirt/top, Pullover and Coat.
+
 ### Slide 5 · Two predictions, written before any network existed
 **On the slide:** two cards, H1 (accuracy) and H2 (mechanism), and the class-mean images showing that the four tops look
 almost identical on average.
@@ -240,6 +275,18 @@ almost identical on average.
   can see collars, buttons and cuffs that fixed edge histograms miss.
 - Both were written down **before** any network was trained, so the results cannot have shaped them (Chapter 1, 1.8).
 - The class-mean images (cosine similarity 0.98 or more among the tops) are why we expected the errors there (D-015).
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Tanmay Singh
+
+> Before training any network, we wrote down two predictions.
+>
+> H1 is about accuracy: a small CNN trained under the same rules beats 91.08%.
+>
+> H2 is about mechanism: it wins mainly by fixing the confusion among the four tops, T-shirt/top, Pullover, Coat and Shirt, because learned filters can see collars, buttons and cuffs that edge histograms miss.
+>
+> These class-mean images show why we expected that: on average the four tops look almost identical, with cosine similarity 0.98 or more.
+>
+> Because both predictions were written first, the results could not shape them.
 
 ### Slide 6 · Same split, same rules, same scorer
 **On the slide:** a bar split into 54,000 train, 6,000 validation and 10,000 test (test shaded as locked), and four rules
@@ -254,6 +301,20 @@ with icons.
   `.predict()`, always with dropout and gradients off (D-037).
 - **Phase 1 outputs never rewritten** (D-033, D-037): Phase 2 writes `summary_all.csv` and new figure names. So any
   difference between models comes from the models, not the measuring.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Tanmay Singh
+
+> To compare fairly, we kept everything from Phase 1.
+>
+> Same split: 54,000 training images, 6,000 validation, 10,000 test. Only the training images ever update the weights.
+>
+> The test set is read once per experiment, only through final_test_run_cnn, and every read is logged: 15 experiments, 15 rows in the test log. There is no test data loader at all.
+>
+> Every choice is made on validation: early stopping, CNN2 versus CNN3, and the hybrid's settings.
+>
+> One evaluate function scores all 15 models. A small wrapper lets the network plug into Phase 1's unchanged scoring code, always with dropout off.
+>
+> So any difference between models comes from the models, not from the measuring.
 
 ### Slide 7 · Training: standard settings, fully reproducible
 **On the slide:** a five-step pipeline (image → mini-batch → loss → optimizer → early stop), five settings chips, and a
@@ -271,6 +332,18 @@ card on the reproducibility bug.
   numbers. Now `train_cnn()` creates its own seed, model and loaders every time; on CPU with deterministic algorithms
   (D-036), a fresh retrain reproduces every validation number exactly.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Tanmay Singh
+
+> Each image goes in as a 1 by 28 by 28 tensor. Pixels are already between 0 and 1, so we compute no statistics from the data.
+>
+> We train in shuffled mini-batches of 64, which is 844 weight updates per epoch.
+>
+> The loss is cross-entropy, the same loss as logistic regression, except that the features are now learned at the same time. The optimizer is Adam with learning rate 0.001. At most 30 epochs, dropout 0.5.
+>
+> We did not tune these settings: the brief asked for a small standard CNN, not a search.
+>
+> We also found and fixed a reproducibility bug: the shuffle order depended on which notebook cells had run before. Now every training run creates its own seed, model and loaders, and a fresh retrain reproduces every validation number exactly.
+
 ### Slide 8 · Early stopping caught the overfitting
 **On the slide:** the training curves for both networks (loss on top, accuracy below; dashed line at the kept epoch) and
 three callouts.
@@ -285,6 +358,16 @@ three callouts.
 - Curious detail: in epoch 1 validation accuracy (85%) beats training accuracy (75%), because training accuracy is
   averaged over an epoch of still-improving weights with dropout switched on.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Tanmay Singh
+
+> After every epoch we score the network on validation. We keep the weights with the lowest validation loss and stop after 5 epochs without improvement.
+>
+> CNN3 is best at epoch 12 of 17; CNN2 at epoch 9 of 14.
+>
+> Look at CNN3 after epoch 12: training loss keeps falling, from 0.175 to 0.127, while validation loss rises, from 0.193 to 0.208. That is overfitting, the network starting to memorise. Early stopping restores epoch 12.
+>
+> At the kept epoch, training and validation accuracy are within half a point: 93.54% versus 93.08%.
+
 ### Slide 9 · Choosing the final network on validation
 **On the slide:** a bar chart of validation accuracy (RBF SVM/HOG 0.9157, CNN2 0.9228, CNN3 0.9308), a card with the
 selection rule and a caveat card.
@@ -295,7 +378,15 @@ selection rule and a caveat card.
 - **Honest caveat:** an earlier CNN2 run that differed only in batch order reached 0.9320. So we do **not** claim the
   third block helps accuracy; that gap is within run-to-run noise. What depth buys is a smaller model (slide 14).
 
-**Hand-over line:** "We have a trained network and a fair way to judge it. Next: what is inside it."
+**Speaker notes** (word for word in the deck) · **Presenter:** Tanmay Singh
+
+> The selection rule was fixed before training: higher validation accuracy wins, ties go to fewer parameters.
+>
+> CNN2 scores 0.9228 and CNN3 0.9308, both above the best classical model at 0.9157. So CNN3 is our final network.
+>
+> One honest caveat: an earlier CNN2 run that differed only in batch order reached 0.9320. So we do not claim the third block improves accuracy; that gap is within run-to-run noise. What depth buys is a smaller model, as slide 14 shows.
+>
+> We have a trained network and a fair way to judge it. Next, Rajdeep explains what is inside it.
 
 ### Likely questions (Part 1)
 - *Why not refit the CNN on train + validation like the classical models?* Early stopping needs validation to decide when
@@ -311,8 +402,12 @@ selection rule and a caveat card.
 
 ## Part 2 — slides 10 to 14: how a CNN works, and our two networks (Rajdeep Sanyal, Anand Mishra)
 
-Slide 10 is the Part 2 divider. Rajdeep presents slides 11–12 (how a CNN works); Anand presents slides 13–14 (our two
-architectures).
+### Slide 10 · Part 2 divider
+**On the slide:** the four topics of Part 2. Rajdeep presents slides 11–12 (how a CNN works); Anand presents slides 13–14 (our two architectures).
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajdeep Sanyal
+
+> Part 2 opens the network up. I will explain how a CNN sees and how it learns its own features. Anand will then walk through our two networks, CNN2 and CNN3, and why the deeper one is smaller.
 
 ### Slide 11 · How a CNN sees: convolution, ReLU, pooling (Rajdeep)
 **On the slide:** a diagram of an image patch with a 3×3 filter window, the resulting feature map, and a 2×2 max-pooled
@@ -330,6 +425,18 @@ output; four cards define convolution, ReLU, pooling and weight sharing.
 - **Stacking grows the receptive field:** 10×10 pixels after two blocks, 22×22 after three. Early layers see edges;
   later layers see parts like sleeves and collars.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajdeep Sanyal
+
+> Convolution: a small 3 by 3 filter of learned weights slides over the image. At each position it multiplies the 9 pixels under it by its weights and adds them up. Where the image matches the pattern, such as an edge, the output is large. The result is a feature map: where in the image is this pattern?
+>
+> The same filter is used everywhere. That is weight sharing: a collar detector works anywhere in the image, with very few parameters.
+>
+> ReLU keeps positive responses and sets negative ones to zero.
+>
+> Max pooling keeps the largest value in each 2 by 2 window. The map halves, and small shifts stop mattering.
+>
+> Stacking blocks grows what each unit sees: 10 by 10 pixels after two blocks, 22 by 22 after three. Early layers see edges; later layers see sleeves and collars.
+
 ### Slide 12 · Learned, not designed: the key difference from HOG (Rajdeep)
 **On the slide:** left, HOG visualisations of sample images ("designed by people"); right, the four-step learning loop
 (predict → loss → backprop → Adam step).
@@ -344,6 +451,18 @@ output; four cards define convolution, ReLU, pooling and weight sharing.
 - **Dropout (p = 0.5):** during training each of the 128 units is switched off with probability 0.5, so the network
   cannot rely on any single unit. At test time dropout is off.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajdeep Sanyal
+
+> This is the key difference from Phase 1. HOG is a fixed recipe designed by people: edge directions in 4 by 4 cells, 1,728 numbers, the same for every dataset.
+>
+> A CNN learns its filters. The final feature maps are flattened into a dense layer of 128 units, then dropout, then 10 class scores.
+>
+> How it learns: the network predicts, the loss measures how wrong it is, backpropagation computes each weight's share of the error, and Adam nudges every weight to reduce it. Repeat this over 844 batches per epoch and the filters become feature detectors. Nobody designs them.
+>
+> Dropout switches off each of the 128 units with probability 0.5 during training, so the network cannot rely on any single unit. At test time it is off.
+>
+> Now Anand will show our two networks.
+
 ### Slide 13 · Our two networks: CNN2 and CNN3 (Anand)
 **On the slide:** two block diagrams, layer by layer, with tensor shapes; conv blocks in orange, the 128-unit feature
 layer in green.
@@ -355,6 +474,16 @@ layer in green.
 - **CNN3:** adds a third block (128 filters): 7×7 → 3×3 (pooling rounds down). Flatten 128×3×3 = **1,152** → Dense 128
   → Dropout → Dense 10.
 - The green layer is **φ(x)**: the 128 numbers CNN3 computes for each image. Part 4's hybrid taps exactly here.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Anand Mishra
+
+> Each block is a 3 by 3 convolution with padding 1, then ReLU, then 2 by 2 max pooling. Padding keeps the size; only pooling halves it.
+>
+> CNN2 has two blocks, 32 then 64 filters: 28 by 28 becomes 14 by 14, then 7 by 7. Flattened, that is 3,136 numbers, then a dense layer of 128, dropout, and 10 outputs.
+>
+> CNN3 adds a third block with 128 filters: 7 by 7 becomes 3 by 3, because pooling rounds down. Flattened, that is only 1,152 numbers, then the same dense layer of 128, dropout and 10 outputs.
+>
+> The green layer is phi of x: the 128 numbers CNN3 computes for each image. Part 4's hybrid taps exactly here.
 
 ### Slide 14 · Deeper, yet 43% smaller (Anand)
 **On the slide:** a stacked bar chart of parameters by layer (conv layers, the first dense layer, the output layer), and
@@ -377,7 +506,17 @@ three CNN2-vs-CNN3 rows: parameters, compute per image, prediction time.
 | Dense (128→10) | 1,290 | 1,290 |
 | **Total** | **421,642** | **241,546** |
 
-**Hand-over line:** "Both networks are built and trained. Next: how they did on the test set."
+**Speaker notes** (word for word in the deck) · **Presenter:** Anand Mishra
+
+> Here is the surprise: the deeper network is 43% smaller, 241,546 parameters against 421,642.
+>
+> Almost all of CNN2's parameters sit in its first dense layer: 3,136 times 128, plus 128, which is 401,536. CNN3's extra pooling shrinks that input to 1,152, so the same layer drops to 147,584.
+>
+> But deeper costs more compute: 7.60 million multiply-adds per image against 4.24 million, because the third convolution runs over a 7 by 7 map. So CNN3 predicts more slowly: 94 against 58 milliseconds per 1,000 images.
+>
+> Speed follows compute, not parameter count.
+>
+> Both networks are built and trained. Rajat will now show how they did on the test set.
 
 ### Likely questions (Part 2)
 - *Why 3×3 filters?* Small filters stacked give a large receptive field with few parameters; it is the standard choice.
@@ -392,7 +531,12 @@ three CNN2-vs-CNN3 rows: parameters, compute per image, prediction time.
 
 ## Part 3 — slides 15 to 18: test results, significance and cost (Rajat Srivastav)
 
-Slide 15 is the Part 3 divider.
+### Slide 15 · Part 3 divider
+**On the slide:** the three topics of Part 3.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajat Srivastav
+
+> Part 3 is the test: one test run per network, whether the gain is statistically real, and what each model costs in speed and size.
 
 ### Slide 16 · One test run each: CNN3 is the most accurate model so far
 **On the slide:** a bar chart of test accuracy (RBF SVM/pixels 89.70, RBF SVM/HOG 91.08, CNN2 91.85, CNN3 92.09) and three
@@ -416,6 +560,20 @@ callouts: **101** fewer errors, **±0.55 points** (95% Wilson interval), **0.920
   0.43), as expected when the best model is chosen on validation. The ranking does not change; the test score is the
   headline.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajat Srivastav
+
+> Only after CNN3 was chosen did we score each network once on the 10,000 test images, with the same evaluate function as Phase 1.
+>
+> CNN3 reaches 92.09% and CNN2 91.85%, against 91.08% for the best classical model and 89.70% for the SVM on raw pixels.
+>
+> That is 101 fewer errors than the SVM: 791 against 892.
+>
+> The 95% Wilson interval is about plus or minus 0.55 points: the range the true accuracy probably lies in.
+>
+> Macro-F1 is 0.9208. It averages F1 over the ten classes, so a weak class counts as much as a strong one.
+>
+> Both CNNs score a little lower on test than on validation, as expected when you pick the best model on validation. The ranking does not change.
+
 ### Slide 17 · Is the gain real? Compare image by image
 **On the slide:** the 2×2 agreement table (8,792 both right, 417 only CNN3, 316 only the SVM, 475 both wrong), the χ²
 calculation, **p = 2.2 × 10⁻⁴**, and the badge "H1 supported".
@@ -427,6 +585,18 @@ calculation, **p = 2.2 × 10⁻⁴**, and the badge "H1 supported".
   this lopsided would happen about 2 times in 10,000. **H1 is supported.**
 - CNN2 also beats the SVM (407 vs 330, p = 0.005). CNN3 vs CNN2: 265 vs 241, **p = 0.31**, not significant, which agrees
   with slide 9's caution about depth.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajat Srivastav
+
+> Both models are tested on the same images, so we compare them image by image.
+>
+> 8,792 images both get right and 475 both get wrong. Those say nothing about which model is better. Only the 733 disagreements matter: 417 only CNN3 gets right, 316 only the SVM gets right. That is McNemar's test.
+>
+> Chi-squared is 417 minus 316, minus 1, squared, over 733: that is 13.6, and p is 2.2 times 10 to the minus 4. If the two models were equally good, a split this lopsided would happen about 2 times in 10,000.
+>
+> So H1 is supported.
+>
+> CNN3 against CNN2 is not significant, p 0.31, which agrees with our caution about depth.
 
 ### Slide 18 · Cheaper by two orders of magnitude
 **On the slide:** a log-scale bar chart of end-to-end prediction time per 1,000 images (RBF SVM/HOG 29,093 ms, Linear
@@ -442,8 +612,19 @@ SVM/HOG 219, CNN3 94, CNN2 58) and two callouts: **~300× faster**, **~377× sma
 - Only two classical models predict faster than the CNNs, Random Forest on pixels (12 ms) and the Linear SVM on pixels
   (1.2 ms), and they are 4.3 and 8.1 points less accurate than CNN2.
 
-**Hand-over line:** "The CNN wins. But it changed two things at once: the features and the classifier. Next: which one
 matters."
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajat Srivastav
+
+> The CNN is also far cheaper. Note the log scale.
+>
+> CNN3 classifies 1,000 images in 94 milliseconds. The SVM needs about 29.1 seconds, including HOG extraction. That is about 300 times faster.
+>
+> CNN3 is 0.97 MB; the SVM stores 26,343 support vectors in 366 MB. That is about 377 times smaller.
+>
+> Why: the SVM compares every new image with every stored support vector, so its cost grows with the training data. The CNN's cost is fixed by its architecture.
+>
+> So the CNN wins. But it changed two things at once, the features and the classifier. Rajdeep will show which one matters.
 
 ### Likely questions (Part 3)
 - *Why McNemar and not just compare accuracies?* The results are paired (same images). McNemar uses that pairing and looks
@@ -458,7 +639,12 @@ matters."
 
 ## Part 4 — slides 19 to 23: the hybrid, features or classifier? (Rajdeep Sanyal)
 
-Slide 19 is the Part 4 divider.
+### Slide 19 · Part 4 divider
+**On the slide:** the four topics of Part 4.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajdeep Sanyal
+
+> Part 4 asks one question: is CNN3's gain in the features it learned, or in the classifier at the end? We answer it with an ablation, changing one component at a time, and then ask which model we would actually deploy.
 
 ### Slide 20 · CNN3 changed two things at once
 **On the slide:** three models drawn as a feature box over a classifier box: RBF SVM/HOG (HOG → RBF SVM, 91.08%), the
@@ -473,6 +659,16 @@ hybrid (CNN3 features → RBF SVM, 92.44%) and CNN3 (CNN3 features → softmax, 
 - The **hybrid** keeps CNN3's feature extractor **frozen** and replaces its final layer with the Phase 1 RBF SVM (D-044).
 - **RBF SVM/HOG vs hybrid:** same classifier, different features, so it measures the **features**.
 - **Hybrid vs CNN3:** same features, different classifier, so it measures the **classifier**.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajdeep Sanyal
+
+> CNN3 beat the SVM, but it differs in two ways: it learns its features instead of using HOG, and it classifies with a softmax layer instead of an RBF SVM.
+>
+> So we split CNN3 in two. The feature extractor turns an image into 128 numbers. The classifier turns those 128 numbers into 10 class scores.
+>
+> The hybrid keeps CNN3's feature extractor frozen and puts the Phase 1 RBF SVM on top.
+>
+> Now each pair changes one thing. SVM on HOG versus the hybrid: same classifier, different features, so it measures the features. Hybrid versus CNN3: same features, different classifier, so it measures the classifier.
 
 ### Slide 21 · Built honestly, one component at a time
 **On the slide:** four numbered method steps and a card with three facts about CNN3's features: **128** numbers,
@@ -495,6 +691,20 @@ hybrid (CNN3 features → RBF SVM, 92.44%) and CNN3 (CNN3 features → softmax, 
 - Code detail: the hybrid's model name is still `rbf_svm`, so a `features` filter keeps it out of Phase 1's
   `summary.csv`.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajdeep Sanyal
+
+> We built it one step at a time.
+>
+> One: we committed the protocol before the run, so the results could not shape it.
+>
+> Two: we extract CNN3's 128 features with dropout off. As a check, CNN3's own final layer on these features gives 0.9308, exactly CNN3's validation accuracy, so we tapped the right layer.
+>
+> Three: exactly the Phase 1 SVM procedure: the same 9-point grid on a 10k subset, refit on 54k to score validation, refit on 60k, one test run.
+>
+> Four: the audit log reaches 15 rows, with no leakage.
+>
+> The features are compact and sparse: 128 numbers against HOG's 1,728, and 77.5% of the values are zero. So each tuning fit took under 1.5 seconds.
+
 ### Slide 22 · The gain is in the features
 **On the slide:** a bar chart of the two effects (+1.36 and +0.35 points, with p-values), the hybrid's **92.44%**, the
 "≈ 4×" callout and a caveat card.
@@ -514,6 +724,18 @@ hybrid (CNN3 features → RBF SVM, 92.44%) and CNN3 (CNN3 features → softmax, 
 - **The +0.35 is fragile:** significant on test (p = 0.012), but tied on validation, and the hybrid's SVM was refit on 60k
   images while CNN3's final layer learned from 54k. The feature effect is the robust result.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajdeep Sanyal
+
+> Tuning picked C equals 1 and gamma equals scale. On validation the hybrid ties CNN3: 0.9313 against 0.9308.
+>
+> On test it reaches 92.44%, 756 errors, the best of all 15 experiments.
+>
+> Now the decomposition. Changing the features, with the classifier fixed, adds 1.36 points, p 5.2 times 10 to the minus 7. Changing the classifier, with the features fixed, adds 0.35 points, p 0.012.
+>
+> So the learned features are worth about four times as much as the classifier. What moved Phase 2 past Phase 1 is what the network learned to see.
+>
+> One caveat: the 0.35 is fragile. It is a tie on validation, and the hybrid's SVM learned from 60k images while CNN3 learned from 54k. The feature effect is the robust result.
+
 ### Slide 23 · Most accurate is not the best to deploy
 **On the slide:** three columns, RBF SVM/HOG vs CNN3 (highlighted, "recommended") vs the hybrid, with accuracy, time per
 1,000 images and model size.
@@ -524,7 +746,15 @@ hybrid (CNN3 features → RBF SVM, 92.44%) and CNN3 (CNN3 features → softmax, 
   than CNN3, and about 9.7 MB (10× CNN3).
 - **For deployment, CNN3 is the better choice:** it gives up only 0.35 points for being ~6.5× faster and 10× smaller.
 
-**Hand-over line:** "Better features help almost everywhere. But did anything finally fix the shirts?"
+**Speaker notes** (word for word in the deck) · **Presenter:** Rajdeep Sanyal
+
+> Most accurate is not the same as best to deploy.
+>
+> The hybrid needs about 609 milliseconds per 1,000 images, including CNN feature extraction, and about 9.7 MB. That is 48 times faster than the HOG SVM, but 6.5 times slower than CNN3 and 10 times larger.
+>
+> CNN3 gives up only 0.35 points for that. So for the shop, we recommend CNN3.
+>
+> Better features help almost everywhere. But did anything finally fix the shirts? Omved will answer that.
 
 ### Likely questions (Part 4)
 - *Why the 128-unit layer and not the conv output?* It is exactly what CNN3's own final layer sees, so the comparison
@@ -544,7 +774,12 @@ hybrid (CNN3 features → RBF SVM, 92.44%) and CNN3 (CNN3 features → softmax, 
 
 ## Part 5 — slides 24 to 31: why Shirt stays hard, conclusion and limits (Omved Nagre)
 
-Slide 24 is the Part 5 divider.
+### Slide 24 · Part 5 divider
+**On the slide:** the four topics of Part 5.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Omved Nagre
+
+> Part 5 looks at the errors: where the gain came from, what happened to Shirt, and what the shared mistakes tell us. Then our conclusion and limits.
 
 ### Slide 25 · The gain is broad; Shirt is the exception
 **On the slide:** a grouped bar chart of test recall for all ten classes (RBF SVM/HOG, CNN3, hybrid), a Shirt-recall card
@@ -555,6 +790,16 @@ Slide 24 is the Part 5 divider.
   Sneaker (−14) and Sandal (−12), and slightly more on Dress (+8). Shirt: +1.
 - Every class moves up except Shirt. Across all 14 trained models in the project, Shirt is always the lowest-recall
   class.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Omved Nagre
+
+> This chart shows test recall for every class and all three models.
+>
+> Compared with the SVM, CNN3 makes fewer errors on Pullover, 28 fewer, T-shirt/top, 22 fewer, and Coat, 15 fewer, and also on Trouser, Sneaker and Sandal. Dress gets slightly worse, 8 more errors.
+>
+> Every class improves except Shirt: 75.2% for the SVM, 75.1% for CNN3, 73.8% for the hybrid.
+>
+> Across all 14 trained models in the project, Shirt is always the lowest class.
 
 ### Slide 26 · The models trade shirts, they don't fix them
 **On the slide:** CNN3's row-normalised confusion matrix, four tiles for the 1,000 test shirts (661 / 90 / 91 / 158) and
@@ -568,6 +813,18 @@ the badge "H2 rejected".
 - Because CNN3 removes easier errors first, the four tops make up a **larger** share of its errors: 539 of 791 (68.1%) vs
   573 of 892 (64.2%).
 - **H2 is rejected.** The gain is real but spread across classes, not concentrated on the tops.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Omved Nagre
+
+> Shirt recall is 75.1% for CNN3 against 75.2% for the SVM. Shirt to T-shirt/top is still the biggest confusion.
+>
+> Look at the 1,000 test shirts. 661 are right for both models and 158 are wrong for both. 90 are right only for CNN3, and 91 right only for the SVM.
+>
+> McNemar p is 1.0: the models swap shirts, they do not fix them.
+>
+> And because CNN3 removes easier errors first, the four tops are a larger share of its errors: 68.1% against 64.2%.
+>
+> So H2 is rejected. The gain is real, but it is spread across classes, not concentrated on the tops.
 
 ### Slide 27 · Shared errors point to the data, not the model
 **On the slide:** the first eight test shirts each model calls T-shirt/top (SVM on top, CNN3 below) and three callouts:
@@ -586,6 +843,16 @@ the badge "H2 rejected".
   (+1.5), and it shares **681** errors with CNN3, **659** (96.8%) with the same wrong label: a different classifier on
   the same features makes almost exactly the same mistakes.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Omved Nagre
+
+> 475 test images are wrong for both CNN3 and the SVM. On 398 of them, 83.8%, both choose the same wrong label.
+>
+> These models see images in completely different ways. When they agree on a wrong answer, the image or its label is the likely problem.
+>
+> These are the first eight shirts each model calls T-shirt/top, not hand-picked. Many are collarless short-sleeved tops, and two are sleeveless tank tops. At 28 by 28, a collar or a button placket is one or two pixels wide, if visible at all.
+>
+> The hybrid makes the point stronger: it shares 681 errors with CNN3, and 659 of them, 96.8%, have the same wrong label. A different classifier on the same features makes almost the same mistakes.
+
 ### Slide 28 · Why H2 failed: an information problem
 **On the slide:** four evidence cards with icons.
 
@@ -600,6 +867,20 @@ it. The evidence says it is an **information** problem:
 More capacity or data can sharpen boundaries, but it cannot recover a collar two pixels wide or settle an ambiguous
 label. Say clearly that this is an inference from shared errors, not a measured ceiling.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Omved Nagre
+
+> H2 assumed the shirt problem was a representation problem: the detail is in the image and HOG misses it. The evidence says it is an information problem.
+>
+> One: different eyes, same mistakes. Unrelated models fail on the same images with the same wrong label.
+>
+> Two: the gain is broad, which is what a generally better feature extractor gives. A targeted fix would have concentrated on Shirt.
+>
+> Three: swapping the classifier moves Dress and Coat, not Shirt.
+>
+> Four: some labels are ambiguous. A person could reasonably call some of these shirts T-shirts.
+>
+> More capacity cannot recover a collar two pixels wide. To be clear, this is an inference from shared errors, not a measured ceiling.
+
 ### Slide 29 · Conclusion
 **On the slide:** the headline "Learned features beat handcrafted ones; the hardest errors live in the data", the
 progression **91.08% → 92.09% → 92.44%**, and three badges: H1 supported, H2 rejected, deploy CNN3.
@@ -610,6 +891,18 @@ progression **91.08% → 92.09% → 92.44%**, and three badges: H1 supported, H2
 - The remaining errors point to the **data** (resolution and labels), not to the choice between handcrafted and learned
   features.
 - **Recommended model for the shop: CNN3.**
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Omved Nagre
+
+> To conclude. The best classical model reaches 91.08%. CNN3 reaches 92.09% while being about 300 times faster and 377 times smaller. The hybrid reaches 92.44%.
+>
+> H1 is supported; H2 is rejected.
+>
+> The improvement comes mainly from the learned representation, not the classifier.
+>
+> The remaining errors point to the data, its resolution and its labels, not to the choice between handcrafted and learned features.
+>
+> Our recommendation for the shop is CNN3.
 
 ### Slide 30 · Limits we know about, and what to try next
 **On the slide:** two cards, limitations and future work.
@@ -623,9 +916,29 @@ progression **91.08% → 92.09% → 92.44%**, and three badges: H1 supported, H2
 - **Future work:** several seeds per network; refit the hybrid's SVM on 54k to remove the data confound; a relabelling
   study of the shared errors; test whether augmentation or higher-resolution images move Shirt recall.
 
+**Speaker notes** (word for word in the deck) · **Presenter:** Omved Nagre
+
+> We want to name our limits before you do.
+>
+> One training run per network, so seed variance is not measured.
+>
+> The CNNs learned from 54k images; the classical models and the hybrid's SVM from 60k.
+>
+> No hyperparameter search for the CNNs, so their results are lower bounds.
+>
+> Timings come from two laptops, so only large gaps are firm. And ambiguous labels were judged by eye; we relabelled nothing.
+>
+> Next we would train several seeds per network, refit the hybrid's SVM on 54k, run a relabelling study of the shared errors, and test whether augmentation or higher resolution moves Shirt recall.
+
 ### Slide 31 · Thank you
 **On the slide:** "Thank you", an invitation to questions, and a card of numbers to remember (all from the cheat sheet
 below). Everyone takes questions; the viva is individual.
+
+**Speaker notes** (word for word in the deck) · **Presenter:** Omved Nagre; all members take questions
+
+> Thank you. The code, results, test-set audit log and decision log are all in our repository.
+>
+> We are happy to take your questions.
 
 ### Likely questions (Part 5)
 - *If the CNN didn't fix shirts, was Phase 2 a failure?* No. H1 held with a significant gain and a huge cost advantage,

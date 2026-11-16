@@ -64,6 +64,7 @@ Rules:
 | D-048 | 2026-11-14 | v2/05 | Report keeps 4 references and no contributions table; contributions live in the README | Superseded by D-049 (references) |
 | D-049 | 2026-11-16 | v2/05 | Report cites the three works it builds on; Related Work tells one story; PDF committed | Active |
 | D-050 | 2026-11-16 | v2/05 | Phase 2 slide deck (.pptx) with a slide-by-slide team guide | Active |
+| D-051 | 2026-11-17 | v2/05 | Word-for-word speaker notes shared by the deck and the guide | Active |
 
 ---
 
@@ -2396,7 +2397,7 @@ means the deck stays light while the reasoning is still written down for prepara
   vs classifier, per-class recall) use numbers from `results/summary_all.csv` and the metrics JSONs; figures come from
   `results/figures/`.
 - One colour per model family throughout: classical terracotta, CNN teal, hybrid violet.
-- Each slide's speaker notes start with "Guide: report/v2/presentation.md, Slide N"; `presentation.md` has a slide map
+- Each slide's speaker notes start with "Guide: report/v2/presentation.md, Slide N" (replaced by full scripts in D-051); `presentation.md` has a slide map
   (number, title, content, presenter, guide section) and one "Slide N · title" section per content slide with what is
   on it and what to say.
 - The generator script is not committed (lean repo); the deck is edited directly in PowerPoint from here on.
@@ -2411,3 +2412,46 @@ means the deck stays light while the reasoning is still written down for prepara
 
 **Revisit if**
 The numbers in `results/` change, or the viva format (time, number of presenters) changes.
+
+### D-051 — Word-for-word speaker notes shared by the deck and the guide
+- **Date:** 2026-11-17
+- **Phase:** v2/05 — Final Report
+- **Status:** Active
+- **Type:** tooling
+
+**Context**
+The deck's speaker notes only pointed back to `presentation.md`. Presenters need to read from the notes while
+presenting, and to study the same words beforehand, so the two must never disagree.
+
+**Decision**
+Every slide's speaker notes now hold who presents it and exactly what to say. The same text, word for word, sits in a
+**Speaker notes** block at the end of that slide's section in `presentation.md`. Slide content is unchanged.
+
+**Alternatives considered**
+| Option | Why not chosen |
+|---|---|
+| Notes only in the deck | Hard to study and review outside PowerPoint; not visible in the repo |
+| Notes only in the guide | Presenters would have to switch between files while presenting |
+| Short bullet cues instead of a script | The team asked for exactly what to say, to the point |
+
+**Why**
+One text in two places lets members study from the guide and read the same words from the notes, with no drift.
+
+**How it works**
+- Each note starts with `Presenter: <name>`, then three to six short spoken lines; the last line hands over to the next
+  presenter by name. The five part dividers (slides 3, 10, 15, 19, 24) got their own sections and scripts.
+- The old "Hand-over line" entries in the guide were folded into the scripts.
+- Only the notes parts of the .pptx were rewritten; every slide is byte-identical to before, and the notes were checked
+  against the guide for all 31 slides (no differences).
+- `.gitignore` now ignores `~$*`, the lock file PowerPoint creates while a deck is open.
+
+**Files touched**
+- `report/v2/phase2_presentation.pptx`: speaker notes for all 31 slides.
+- `report/v2/presentation.md`: a Speaker notes block per slide; divider sections; intro and slide map updated.
+- `.gitignore`: Office lock files.
+
+**Concepts worth learning**
+- **Single source of truth:** keep one text and copy it mechanically, so two documents cannot drift apart.
+
+**Revisit if**
+A slide or its presenter changes: update the guide's block and the deck's notes together.
